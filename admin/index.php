@@ -95,6 +95,7 @@
 	<?php include_once('style.php');?>
 	<link rel="stylesheet/less" type='text/css' href="css/style.less">
 	<link href="../new_year/css/new_year.css" rel="stylesheet">
+	
 </head>
 <body>
 	<div id='lll' style='width: 100%; height: 100%; position: fixed; top:0; background-color: rgba(0,0,0,0); z-index: 100;'>
@@ -252,7 +253,7 @@
 						?>
 					</div>
 				</div>
-				<div class='col-md-4 col-sm-4'>
+				<div class='col-md-4 col-sm-4' style='display: none;'>
 					<form class='delete_subject' onsubmit='return beforeSubmit();' action='admin_controller.php' method='post'>
 						<input type="hidden" name="data_num" value='<?php echo $for_topic;?>'>
 						<input type="submit" class='btn btn-xs btn-default delete-btn' name="delete_subject" value='Удалить "<?php echo $subject_name;?>"'>
@@ -1459,24 +1460,46 @@ $(document).on('click','#remove_img',function(){
 		$(this).parents("b").html('<p class="text-danger">Изображение удалено!</p>');
 	}
 });
-// $(document).on('keyup','#context',function(){
-// 	// console.log('asdfasdf');
-//      var text = $(this).val();
-//      var arr = text.split("\n");
-//      for(var i = 0; i < arr.length; i++) {
-//          if(arr[i].length > 75) {
-//             $('#news-content-helper').html("Жолдың (қатардын реті: "+(i+1)+") ұзындығы 76 символдан артық кетті!<br>Жолдың ұзақ болғаны не желательно.");
-//             event.preventDefault(); // prevent characters from appearing
-//             break;
-//          }
-//          else{
-//          	$('#news-content-helper').html('');
-//          }
-//      }
+$(document).on('click','.open-access',function(){
+	$data_num = $(this).data('num');
+	$data_block = $(this).data('block');
+	$this = $(this);
+	var formData = {
+		'block':$data_block,
+		'sn':$data_num
+	};
+	$.ajax({
+    	url: "ajaxDb.php?<?php echo md5(md5('openAccess'))?>",
+		type: "POST",
+		data:  formData,
+	    cache: false,
+		beforeSend:function(){
+			$('#lll').css('display','block');
+		},
+		success: function(dataS){
+			$('#lll').css('display','none');
+	    	// console.log(dataS);
+	    	data = $.parseJSON(dataS);
+	    	// console.log(data);
+	    	if(data.success){
+	    		$this.parents('tr').css({'border':'2px solid red'});
+	    		$this.parents('tr').find('.warned').html('<b style="color:#f00;">Ескертілген</b>');
+	    		$this.remove();
+	    	} 
+	    	else{
+	    		console.log(data);
+	    		alert("Ошибка!");
+	    	}
+	    },
+	  	error: function(dataS) 
+    	{
+    		console.log(dataS);
+    		alert("Ошибка!");
+    	} 	        
+   	});
+});
 
-//      // console.log(arr.length + " : " + JSON.stringify(arr));
-// });
-	</script>
+</script>
 </body>
 <?php $_SESSION['load_page'] = false; ?>
 </html>

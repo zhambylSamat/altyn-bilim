@@ -37,15 +37,8 @@
 	}
 ?>
 <ol class="breadcrumb">
-	<?php
-		if(isset($_GET['action']) && $_GET['action']=='forcibly'){
-			echo "<li class='active'>".str_replace("_", " ", $student_name)."</li>";
-		}
-		else{
-	?>
 	<li><a class='back' style='cursor:pointer;'>Студенттер тізмі</a></li>
 	<li class="active"><?php echo str_replace("_", " ", $student_name);?></li>
-	<?php } ?>
 	<?php
 		if($subject_num == 'S59848243b8350348070654'){
 	?>
@@ -134,7 +127,7 @@
 		<?php } ?>
 	</table>
 </center>
-<center><button class='btn btn-sm btn-success save-btn-disable <?php echo (isset($_GET['action']) && $_GET['action'] == 'forcibly') ? "ok-forcibly" : "ok";?>' <?php echo (isset($_GET['action']) && $_GET['action'] == 'forcibly') ? "" : "data-num='".$student_num."'" ?>>Сақтау</button></center>
+<center><button class='btn btn-sm btn-success save-btn-disable ok' data-num='<?php echo $student_num;?>'>Сақтау</button></center>
 <script type="text/javascript">
 	$count = 0;
 	$(document).ready(function(){

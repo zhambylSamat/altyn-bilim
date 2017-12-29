@@ -1,92 +1,126 @@
 <?php
 	include_once("../connection.php");
+	$dir = "../documents/problem_solving/";
 	if(isset($_GET[md5('elementNum')])){
 		$elementNum = $_GET[md5('elementNum')];
+		$res = array();
 		try {
-			$stmt = $conn->prepare("SELECT * FROM topic WHERE subject_num = :subject_num AND quiz = 'n'");
+			$stmt = $conn->prepare("SELECT t.topic_num, 
+										t.topic_name, 
+										st.subtopic_num, 
+										st.subtopic_name, 
+										v.video_num, 
+										v.video_link, 
+										ps.problem_solution_id, 
+										ps.document_link, 
+										tst.test_num, 
+										tst.last_date
+									FROM topic t 
+										INNER JOIN subtopic st
+									    	ON st.topic_num = t.topic_num
+									    LEFT JOIN video v
+									    	ON v.subtopic_num = st.subtopic_num
+									   	LEFT JOIN problem_solution ps
+									    	ON ps.subtopic_num = st.subtopic_num
+									    LEFT JOIN test tst
+									    	ON tst.subtopic_num = st.subtopic_num
+									WHERE t.subject_num = :subject_num
+										AND quiz = 'n'
+									ORDER BY t.topic_order, st.subtopic_order ASC");
 
 			$stmt->bindParam(':subject_num', $subject_num, PDO::PARAM_STR);
 
 			$subject_num = $elementNum;
 	     	
 		    $stmt->execute();
-		    $topic = $stmt->fetchAll();
-		    // echo "Coming soon...";
-		    
+		    $result = $stmt->fetchAll();
+		    foreach ($result as $k => $v) {
+		    	$res[$v['topic_num']]['topic_name'] = $v['topic_name'];
+		    	$res[$v['topic_num']]['subtopic'][$v['subtopic_num']]['subtopic_name'] = $v['subtopic_name'];
+		    	$res[$v['topic_num']]['subtopic'][$v['subtopic_num']]['video'][$v['video_num']] = $v['video_link'];
+		    	$res[$v['topic_num']]['subtopic'][$v['subtopic_num']]['file'][$v['problem_solution_id']] = $v['document_link'];
+		    	// $res[$v['topic_num']]['subtopic'][$v['subtopic_num']]['test'][$v['test_num']] = $v['last_date'];
+		    	$res[$v['topic_num']]['subtopic'][$v['subtopic_num']]['test'] = $v['last_date'];
+		    }	    
 		} catch(PDOException $e) {
 	        echo "Error: " . $e->getMessage();
 	    }
 	}
 ?>
-	<table class='table table-striped'>
-		<tr class='active'>
-			<th><center>#</center></th>
-			<th><center>Video</center></th>
-			<th><center>Test</center></th>
-		</tr>
-		<?php foreach($topic as $topic_readrow){?>
-		<tr class='info'>
-			<td colspan='3'><center><?php echo $topic_readrow['topic_name'];?></center></td>
-		</tr>
-		<?php
-			try {
-				$stmt = $conn->prepare("SELECT *  FROM subtopic WHERE topic_num = :topic_num");
-
-				$stmt->bindParam(':topic_num', $topic_num, PDO::PARAM_STR);
-
-				$topic_num = $topic_readrow['topic_num'];
-		     	
-			    $stmt->execute();
-			    $subtopic = $stmt->fetchAll();
-			    // echo "Coming soon...";
-			    
-			} catch(PDOException $e) {
-		        echo "Error: " . $e->getMessage();
-		    }
-		?>
-		<?php $count_subtopic = 1; 
-			foreach($subtopic as $subtopic_readrow){
-			try {
-				$stmt_video = $conn->prepare("SELECT * FROM video WHERE subtopic_num = :subtopic_num");
-				$stmt_test = $conn->prepare("SELECT * FROM test WHERE subtopic_num = :subtopic_num");
-
-				$stmt_video->bindParam(':subtopic_num', $subtopic_num, PDO::PARAM_STR);
-				$stmt_test->bindParam(':subtopic_num', $subtopic_num, PDO::PARAM_STR);
-
-				$subtopic_num = $subtopic_readrow['subtopic_num'];
-		     	
-			    $stmt_video->execute();
-			    $stmt_test->execute();
-			    $video = $stmt_video->fetch(PDO::FETCH_ASSOC);
-			    $test = $stmt_test->fetch(PDO::FETCH_ASSOC);
-			    $data_video = $data_test = "<h5 class='text-danger'>&#171;Материал еще не добавлен.&#187;</h5>";
-			    if(isset($video['video_num'])){
-			    	$data_video = "<h5 class='text_success'>".$video['video_link']."</h5>";
-			    }
-				if(isset($test['test_num'])){ 
-					$comment = 'Комментарии отсутствуют';
-					if(isset($test['test_comment'])) $comment = $test['test_comment'];
-					$data_test = "<h5 class='text-success'>".$test['last_date']."<br>".$comment."</h5>";
+<table class='table table-striped table-bordered'>
+	<?php 
+		$topic_count = 0;
+		foreach ($res as $topic_num => $v) { 
+	?>
+	<tr class='info'>
+		<td colspan='4'><center><?php echo $v['topic_name'];?></center></td>
+	</tr>
+	<tr class='active'>
+		<th><center>#</center></th>
+		<th><center>Видео</center></th>
+		<th><center>Есеп</center></th>
+		<th><center>Тест</center></th>
+	</tr>
+	<?php 
+		$existing = array(0, 0, 0);
+		$subtopic_count=0; 
+		foreach ($v['subtopic'] as $subtopic_num => $v) { ?>
+	<tr id="<?php echo ++$topic_count;?>_tr">
+		<td><?php echo ++$subtopic_count.". ".$v['subtopic_name']; ?></td>
+		<td>
+			<?php
+				$video_count = 0;
+				foreach ($v['video'] as $video_num => $val) {
+					if($video_num!='') {
+						$video_count++; 
+						echo "<p style='margin:0;'>".$val."</p>";
+						$existing[0] = 1;
+					}
 				}
-
-				$table_class='danger';
-				if(isset($video['video_num']) && isset($test['test_num'])){
-					$table_class='success';
+				if($video_count==0) {
+					echo "<p style='margin:0;' class='text-danger'>Видео енгізілмеген!</p>";
+					$existing[0] = 0;
+				} 
+			?>
+		</td>
+		<td>
+			<?php
+				$file_count = 0;
+				foreach ($v['file'] as $doc_id => $val) {
+					if($doc_id==!''){
+						$file_count++;
+						echo "<p style='margin:0;'><a href=".$dir.$val." target='_blank'>".explode("___", $val)[0].".pdf</a></p>";
+						$existing[1] = 1;
+					}
 				}
-				else if(isset($video['video_num']) || isset($test['test_num'])){
-					$table_class='warning';
+				if($file_count==0) {
+					echo "<p style='margin:0;' class='text-danger'>Файл енгізілмеген!</p>"; 
+					$existing[1] = 0;
 				}
-			    // echo "Coming soon...";
-			    
-			} catch(PDOException $e) {
-		        echo "Error: " . $e->getMessage();
-		    }
-		?>
-		<tr class='<?php echo $table_class;?>'>
-			<td><center><?php echo $count_subtopic++.". ".$subtopic_readrow['subtopic_name'];?></center></td>
-			<td><center><?php echo $data_video;?></center></td>
-			<td><center><?php echo $data_test?></center></td>
-		</tr>
-		<?php }?>
-	<?php }?>
+			?>
+		</td>
+		<td>
+			<?php
+				if($v['test']!=''){
+					echo "<p style='margin:0;'>".$v['test']."</p>";
+					$existing[2] = 1;
+				}
+				else {
+					echo "<p style='margin:0;' class='text-danger'>Тест енгізілмеген!</p>";
+					$existing[2] = 0;
+				}
+			?>
+		</td>
+	</tr>
+	<?php
+		$class='danger';
+		if(array_sum($existing)<3 && array_sum($existing)!=0){
+			$class='warning';
+		} 	
+		else if(array_sum($existing)==3){
+			$class='success';
+		}
+		echo "<script type='text/javascript'>$('#".$topic_count."_tr').addClass('".$class."');</script>" ; 
+		}} 
+	?>
 </table>

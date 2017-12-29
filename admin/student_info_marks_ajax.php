@@ -174,15 +174,20 @@
 				}
 				$total_attendance++;
 				$attendance = ($value['attendance']==1) ? $attendance+1 : $attendance;
-				$total_home_work = ($value['attendance']==1) ? $total_home_work+1 : $total_home_work;
-				$home_work = ($value['home_work']!=0) ? $home_work+$value['home_work'] : $home_work;
+				if($value['attendance']==1 && $value['home_work']!=-0.1){
+					$total_home_work++;	
+				}
+				// $home_work = ($value['home_work']!=0) ? $home_work+$value['home_work'] : $home_work;
+				if($value['home_work']!=0 && $value['home_work']!=-0.1){
+					$home_work = $home_work+$value['home_work'];
+				}
 				$date = date("m", strtotime($value['created_date']));
 		?>
 			<tr style="display:<?php echo $display;?>;" class='<?php echo $month[intval(date("m", strtotime($value['created_date'])))]; ?>'>
 				<th><center><?php echo ++$month_count;?></center></th>
 				<td><center><?php echo $month[intval(date("m", strtotime($value['created_date'])))]." ".date("d", strtotime($value['created_date'])); ?></center></td>
 				<td><center><?php echo ($value['attendance']==1) ? "<span class='glyphicon glyphicon-plus text-success'></span>" : "<span class='glyphicon glyphicon-minus text-danger'></span>"; ?></center></td>
-				<td><center><?php echo ($value['attendance']==0) ? "<span class='glyphicon glyphicon-minus text-warning'></span>" : $value['home_work']; ?></center></td>
+				<td><center><?php echo ($value['attendance']==0) ? "<span class='glyphicon glyphicon-minus text-warning'></span>" : (($value['home_work']==-0.1) ? "<span class='glyphicon glyphicon-minus text-warning'></span>" : $value['home_work']); ?></center></td>
 			</tr>
 		<?php
 			$count++; 

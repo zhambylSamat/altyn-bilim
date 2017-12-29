@@ -28,12 +28,12 @@
 <center><p style='cursor: pointer;'><u><a class='add-trial-test-mark'>Баға енгізу</a></u></p></center>
 <form method='post' id='trial_test_form' style='display: none;'>
 	<div class='form-group'>
-		<label for='trial-mark' style='display: inline-block;'>Балл:&nbsp;</label>
-		<input type="number" class='form-control' min='0' max='40' step='1' name="trial_mark" id='trial-mark' value='0' required="" style='display: inline-block; width: 50%;'>
-	</div>
-	<div class='form-group'>
 		<label for='trial-date' style='display:inline-block;'>Дата:&nbsp;</label>
 		<input type="text" class='form-control datePicker' placeholder="dd.mm.yyyy" id='trial-date' name="trial_date" required="" style='display:inline-block; width: 50%;'>
+	</div>
+	<div class='form-group'>
+		<label for='trial-mark' style='display: inline-block;'>Балл:&nbsp;</label>
+		<input type="number" class='form-control' min='0' max='40' step='1' name="trial_mark" id='trial-mark' value='0' required="" style='display: inline-block; width: 50%;'>
 	</div>
 	<input type="hidden" name="stdn" value="<?php echo $student_num; ?>">
 	<input type="hidden" name="sjn" value='<?php echo $subject_num;?>'>

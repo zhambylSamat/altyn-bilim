@@ -78,7 +78,7 @@
 				</h4>
 			</center>
 		</td>
-		<td style='width: 74%'>
+		<td style=''>
 			<form class='form-inline form-edit user_info' action='admin_controller.php' method='post' style='display:none;'>
 				<div class='form-group'>
 					<input type="text" class='form-control' name="surname" required="" value="<?php echo $readrow['surname'];?>">
@@ -119,7 +119,7 @@
 			</div>
 		</td>
 		<td>
-			<form style='display: inline-block;' onsubmit="return confirm('Вы точно хотите удалить студента? Все данные об студенте будут удалены.')" action='admin_controller.php' method='post'>
+			<form style='display: inline-block;' onsubmit="return confirm('Вы точно хотите удалить студента? Все данные об студенте будут удалены.')" action='' method=''>
 				<center>
 					<a class='btn btn-default btn-xs more_info' data-name='student' data_toggle='false' data_num = "<?php echo $readrow['student_num']?>" title='Толығырақ'>
 						<span class='glyphicon glyphicon-list-alt text-primary' aria-hidden='true' style='font-size: 20px; cursor: pointer;'></span>
@@ -152,6 +152,14 @@
 					</button>
 				</center>
 			</form>
+			<form style='display: inline-block;' onsubmit="return confirm('Подтвердите действие!')" method='post' action='admin_controller.php'>
+				<center>
+					<input type="hidden" name="data_num" value='<?php echo $readrow['student_num']?>'>
+					<button type='submit' name='student_no_contract' class="btn btn-default btn-xs" title='Договор өткізбегендер'>
+						<span class='glyphicon glyphicon-file text-danger' aria-hidden='true' style='font-size: 20px; cursor: pointer;'></span>
+					</button>
+				</center>
+			</form>
 		</td>
 	</tr>
 	<tr class='body'>
@@ -167,7 +175,7 @@
 		if(!isset($_GET['search']) || $_GET['search']==''){ 
 			try {
 				
-				$stmt = $conn->prepare("SELECT * FROM student WHERE block = 2 order by surname asc");
+				$stmt = $conn->prepare("SELECT * FROM student WHERE block = 2 OR block = 3 order by surname asc");
 				$stmt->execute();
 				$result_no_payment_student = $stmt->fetchAll(); 
 			} catch (PDOException $e) {
@@ -190,14 +198,17 @@
 		$student_no_payment_number = 1;
 		foreach ($result_no_payment_student as $readrow) {
 	?>
-	<tr class='head'>
+	<tr class='head' style='<?php if($readrow['block']==3){ echo "border: 2px solid red;"; } ?>'>
 		<td style='width: 5%;'><center><h4><?php echo $student_no_payment_number;?></h4></center></td>
 		<td style='width: 75%;'>
 			<div>
 				<table class='table' style='background-color:rgba(0,0,0,0); margin:0; padding:0; border:none;'>
 					<tr style='width: 100%;'>
-						<td style='width: 50%;'><h4 class='text-success'><?php echo $readrow['surname']?>&nbsp;<?php echo $readrow['name']?></h4> </td>
+						<td style='width: 50%;'><h4 class='text-success'><a href="student_info_marks.php?data_num=<?php echo $readrow['student_num']; ?>" target="_blank"><?php echo $readrow['surname']?>&nbsp;<?php echo $readrow['name']?></h4></a></td>
 						<td style='width: 50%;'><h5>Username: <b class='text-info'><?php echo $readrow['username']?></b></h5></td>
+						<td class='warned'>
+							<?php if($readrow['block']==3){?><b style='color:#f00;'>Ескертілген</b><?php } ?>
+						</td>
 					</tr>
 				</table>				
 			</div>
@@ -225,6 +236,11 @@
 						</button>
 					</center>
 				</form>
+				<br>
+				<br>
+				<?php if($readrow['block']!=3){ ?>
+				<a class='btn btn-warning btn-sm open-access' data-num='<?php echo $readrow['student_num']?>' data-block='3'>Открыть портал</a>
+				<?php }?>
 			</center>
 		</td>
 	</tr>
@@ -235,6 +251,94 @@
 			$student_no_payment_number++; 
 		} 
 		if($student_no_payment_number == 1){
+			echo "<center><h1 class='text-primary'>N/A</h1></center>";
+		}
+	?>
+</table>
+<hr>
+<center><h3 class='text-warning'>Договор өткізбегендер!</h3></center>
+<table class="table table-striped table-bordered">
+	<?php
+		$result_no_contract_student = array();
+		if(!isset($_GET['search']) || $_GET['search']==''){ 
+			try {
+				
+				$stmt = $conn->prepare("SELECT * FROM student WHERE block = 4 OR block = 5 order by surname asc");
+				$stmt->execute();
+				$result_no_contract_student = $stmt->fetchAll(); 
+			} catch (PDOException $e) {
+				echo "Error ".$e->getMessage()." !!!";
+			}
+			$_SESSION['result_no_contract_student'] = $result_no_contract_student;
+		}
+		else{
+			$q = $_GET['search'];
+			foreach ($_SESSION['result_no_contract_student'] as $val) {
+				if (strpos(mb_strtolower($val['name']), mb_strtolower($q)) !== false 
+					|| strpos(mb_strtolower($val['surname']), mb_strtolower($q)) !== false 
+					|| strpos(mb_strtolower($val['username']), mb_strtolower($q)) !== false 
+					|| strpos((mb_strtolower($val['surname'])."_".mb_strtolower($val['name'])), mb_strtolower($q)) !== false 
+					|| strpos((mb_strtolower($val['name'])."_".mb_strtolower($val['surname'])), mb_strtolower($q)) !== false) {
+					array_push($result_no_contract_student, $val);
+				}
+			}
+		}
+		$student_no_contract_number = 1;
+		foreach ($result_no_contract_student as $readrow) {
+	?>
+	<tr class='head' style='<?php if($readrow['block']==5){ echo "border: 2px solid red;"; } ?>'>
+		<td style='width: 5%;'><center><h4><?php echo $student_no_contract_number;?></h4></center></td>
+		<td style='width: 75%;'>
+			<div>
+				<table class='table' style='background-color:rgba(0,0,0,0); margin:0; padding:0; border:none;'>
+					<tr style='width: 100%;'>
+						<td style='width: 50%;'><h4 class='text-success'><a href="student_info_marks.php?data_num=<?php echo $readrow['student_num']; ?>" target="_blank"><?php echo $readrow['surname']?>&nbsp;<?php echo $readrow['name']?></h4></a></td>
+						<td style='width: 50%;'><h5>Username: <b class='text-info'><?php echo $readrow['username']?></b></h5></td>
+						<td class='warned'>
+							<?php if($readrow['block']==5){?><b style='color:#f00;'>Ескертілген</b><?php } ?>
+						</td>
+					</tr>
+				</table>				
+			</div>
+		</td>
+		<td style='width:20%'>
+			<center>
+				<a class='btn btn-default btn-sm more_info' data-name='student' data_toggle='false' data_num = "<?php echo $readrow['student_num']?>" title='Толығырақ'>
+					<span class='glyphicon glyphicon-list-alt text-primary' aria-hidden='true' style='font-size: 20px; cursor: pointer;'></span>
+				</a>
+				<form style='display: inline-block;' method='post' action='admin_controller.php'>
+					<center>
+						<input type="hidden" name="data_num" value='<?php echo $readrow['student_num'];?>'>
+						<button type='submit' class='btn btn-default btn-sm' name='unblock_student'>
+							<span class='glyphicon glyphicon-ok-circle text-success' aria-hidden='true' style='font-size: 20px; cursor: pointer;'></span>
+						</button>
+					</center>
+				</form>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<form style='display: inline-block;' onsubmit='return confirm("Вы точно хотите удалить студента? Все данные об студенте будут удалены.");' method='post' action='admin_controller.php'>
+					<center>
+						<input type="hidden" name="remove-student-num" value="<?php echo $readrow['student_num']?>">
+						<button class='btn btn-danger btn-xs' type='submit' value='student_num' name='remove_student' title='Жою' style='height:25px;'>
+							<!-- <span class='glyphicon glyphicon-remove text-danger' aria-hidden='true' style='font-size: 15px; vertical-align: center; cursor: pointer;'></span> -->
+							<b style='color:white; vertical-align: middle;'>Удалить</b>
+						</button>
+					</center>
+				</form>
+				<br>
+				<br>
+				<?php if($readrow['block']!=5){ ?>
+				<a class='btn btn-warning btn-sm open-access' data-num='<?php echo $readrow['student_num']?>' data-block='5'>Открыть портал</a>
+				<?php }?>
+			</center>
+		</td>
+	</tr>
+	<tr class='body'>
+		
+	</tr>
+	<?php
+			$student_no_contract_number++; 
+		} 
+		if($student_no_contract_number == 1){
 			echo "<center><h1 class='text-primary'>N/A</h1></center>";
 		}
 	?>

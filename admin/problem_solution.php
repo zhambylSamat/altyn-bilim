@@ -3,7 +3,7 @@
 	$subtopic_num = $_GET['data_num'];
 	$dir = "../documents/problem_solving/";
 	try {
-		$stmt = $conn->prepare("SELECT * FROM problem_solution WHERE subtopic_num = :subtopic_num");
+		$stmt = $conn->prepare("SELECT * FROM problem_solution WHERE subtopic_num = :subtopic_num ORDER BY document_link ASC");
 		$stmt->bindParam(':subtopic_num', $subtopic_num, PDO::PARAM_STR);
 		$stmt->execute();
 		$result = $stmt->fetchAll();

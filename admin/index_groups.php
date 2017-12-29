@@ -81,14 +81,6 @@
 							echo "Error ".$e->getMessage()." !!!";
 						}
 					?>
-					<select name='group_subject' class='form-control' required="">
-						<option value=''>Пән</option>
-						<?php 
-							foreach ($result_group_subject as $sValue) {
-						?>
-						<option value='<?php echo $sValue['subject_num'];?>' <?php echo ($sValue['subject_name']==$value['subject_name']) ? "selected" : ''; ?>><?php echo $sValue['subject_name'];?></option>
-						<?php } ?>
-					</select>
 					<textarea name='group_comment' class='form-control' rows='1' cols='30'><?php echo $value['comment'];?></textarea>
 					<input type="hidden" name="data_num" value='<?php echo $value['group_info_num'];?>'>
 				</div>

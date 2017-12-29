@@ -143,9 +143,6 @@
 												</a>
 												<?php } ?>
 											</td>
-											<td class='student-progress'>
-												<a class="btn btn-xs btn-default list-progress" data-toggle='modal' data-target='.box-list-student-progress'>Тақырыбы</a>
-											</td>
 										<!-- </div> -->
 									</tr>
 								<?php
@@ -618,27 +615,17 @@
 
 
 	// ------------------------------TRIAL-TEST-END-----------------------------------------------------
-	// ------------------------------START-STUDENT-PROGRESS---------------------------------------------
-
-	$(document).on('click','.list-progress',function(){
-		$gsn = $(this).parents('.head-student').find('input[name=gsn]').val();
-		$sn = $(this).parents('.head-student').find('input[name=sn]').val();
-		$student_name = $(this).parents('.head-student').find('input[name=student_name]').val();
-		$('.box-list-student-progress .modal-header h3').html("<center><b><?php echo ucwords($result_group_info['subject_name']);?></b> пәні бойынша тақырыптар тізмі.<br><b>Студент: "+$student_name+"</b></center>");
-		// modal two .box-list-student-progress
-		$('.box-list-student-progress .modal-body').text("Loading...");
-		$('.box-list-student-progress .modal-body').load("load_student_progress.php?sn="+$sn+"&sjn=<?php echo $subject_num;?>&action=forcibly&name="+$(this).parents('.head-student').find('.header-student').text().replace(/\s/g,"_"));
-	});
+	// ------------------------------START-STUDENT-PROGRESS--------------------------------------------
 	//  ----------------------------START_STATIC_ALGEBRA_&_GEOMETRY---------------------------------------------------
 	$(document).on('click','.static-subject-btn',function(){
 		console.log($(this));
 		$sn = $(this).data('sn');
 		$sjn = $(this).data('sjn');
 		$name = $(this).data('name').replace(/\s/g, "_");
-		console.log("load_student_progress.php?sn="+$sn+"&sjn="+$sjn+"&action=forcibly&name="+$name);
+		console.log("load_student_progress.php?sn="+$sn+"&sjn="+$sjn+"&name="+$name);
 		$('.box-list-student-progress .modal-header h3').html("<center><b><?php echo ucwords($result_group_info['subject_name']);?></b> пәні бойынша тақырыптар тізмі.<br><b>Студент: "+$name+"</b></center>");
 		$('.box-list-student-progress .modal-body').text("Loading...");
-		$('.box-list-student-progress .modal-body').load("load_student_progress.php?sn="+$sn+"&sjn="+$sjn+"&action=forcibly&name="+$name);	
+		$('.box-list-student-progress .modal-body').load("load_student_progress.php?sn="+$sn+"&sjn="+$sjn+"&name="+$name);	
 	});
 	//  ----------------------------END_STATIC_ALGEBRA_&_GEOMETRY-----------------------------------------------------
 	$(document).on('click','#progress, .ok, .back',function(){
@@ -666,10 +653,6 @@
 			$('#reset').show();
 		}
 		$('.box-list-student-progress .modal-body').html($html_part);
-	});
-
-	$(document).on('click','.ok-forcibly',function(){
-		$('.box-list-student-progress').modal('hide');
 	});
 
 	$(document).on('click','.single-student-progress',function(){

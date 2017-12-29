@@ -460,6 +460,24 @@ else if(isset($_GET[md5(md5('removeProblemSolvingFile'))])){
 	}
 	echo json_encode($data);
 }
+else if(isset($_GET[md5(md5('openAccess'))])){
+	try {
+		include_once('../connection.php');
+		$student_num = $_POST['sn'];
+		$block = $_POST['block'];
+		$block_date = date("Y-m-d H:i:s");
+		$stmt = $conn->prepare("UPDATE student SET block = :block, block_date = :block_date WHERE student_num = :student_num");
+		$stmt->bindParam(':block', $block, PDO::PARAM_INT);
+		$stmt->bindParam(':block_date', $block_date, PDO::PARAM_STR);
+		$stmt->bindParam(':student_num', $student_num, PDO::PARAM_STR);
+		$stmt->execute();
+		$data['success'] = true;
+	} catch (PDOException $e) {
+		$data['success'] = false;
+		$data['error'] .= "Error : ".$e->getMessage()." !!!";
+	}
+	echo json_encode($data);
+}
 
 
 

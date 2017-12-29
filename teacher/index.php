@@ -5,7 +5,23 @@
 	}
 	$result_groups = array();
 	try {
-		$stmt = $conn->prepare("SELECT gi.group_info_num group_info_num, gi.group_name group_name, gi.comment comment, s.subject_name subject_name, (SELECT count(*) FROM group_student gs, student s WHERE gs.group_info_num = gi.group_info_num AND s.student_num = gs.student_num AND s.block != 1 ) student_quantity FROM group_info gi, teacher t, subject s WHERE gi.teacher_num=t.teacher_num AND t.teacher_num = :teacher_num AND gi.subject_num = s.subject_num order by gi.last_update asc");
+		$stmt = $conn->prepare("SELECT gi.group_info_num, 
+									gi.group_name, 
+									gi.comment, 
+									s.subject_name, 
+									(SELECT count(*) 
+									FROM group_student gs, 
+										student s 
+									WHERE gs.group_info_num = gi.group_info_num 
+										AND s.student_num = gs.student_num 
+										AND s.block != 1 ) student_quantity 
+								FROM group_info gi, 
+									teacher t, 
+									subject s 
+								WHERE gi.teacher_num=t.teacher_num 
+									AND t.teacher_num = :teacher_num 
+									AND gi.subject_num = s.subject_num 
+								ORDER BY gi.last_update ASC");
 		$stmt->bindParam(':teacher_num', $_SESSION['teacher_num'], PDO::PARAM_STR);
 	    $stmt->execute();
 	    $result_groups = $stmt->fetchAll();
@@ -34,6 +50,7 @@
 					<?php if(isset($_SESSION['news_notificaiton_teacher']) ){?>
 					<button class='btn btn-primary news' type='button' data-toggle='modal' data-target='.box-news'>Жаңалықтар</button>
 					<?php }?>
+					<button class='btn btn-primary problem-solution' type='button' data-toggle='modal' data-target='.box'>Есеп</button>
 				</div>
 			</div>
 			<div class='col-md-12 col-sm-12 col-xs-12' style='overflow-x: scroll;'>
@@ -122,6 +139,21 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade box" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+    	<div class="modal-header">
+    		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">X</span></button>
+    		<br>
+    		<center><h3 class="modal-title"></h3></center>
+    	</div>
+    	<div class="modal-body">
+    	</div> 
+    </div>
+  </div>
+</div>
+
 
 <div id='lll'>
 	<center>
@@ -261,8 +293,30 @@
 	    	} 	        
 	   	});
 	});
+
+	$(document).on('click','.problem-solution', function(){
+		$(".box .modal-title").html("<center><h3>Есеп</h3></center>");
+		$(".box .modal-body").html("<center><h3>Loading...</h3></center>");
+		$(".box .modal-body").load("load_problem_solution.php");
+	});
+
+	$(document).on('click','.subject-solution-list',function(){
+		$data_num = $(this).data('num');
+		$(".box .modal-body").html("<center><h3>Loading...</h3></center>");
+		$(".box .modal-body").load("load_problem_solution.php?back&<?php echo md5('sn'); ?>="+$data_num);
+	});
+
+	$(document).on('click','#back-to-subject-list',function(){
+		$(".box .modal-body").html("<center><h3>Loading...</h3></center>");
+		$(".box .modal-body").load("load_problem_solution.php");
+	});
+
 	$(document).on('click','#implementedSuggestion',function(){
 		$('#implementedSuggestionBox').fadeToggle();
+	});
+
+	$(document).on('click','.topic-name',function(){
+		$(this).next().slideToggle('fast');
 	});
 </script>
 </body>

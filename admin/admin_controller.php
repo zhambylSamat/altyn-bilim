@@ -78,7 +78,7 @@ if(isset($_POST['remove_student'])){
 
 		header('location:index.php');
 	} catch (PDOException $e) {
-		echo "Error ".$e->getMessge()." !!!";
+		echo "Error : ".$e->getMessage()." !!!";
 	}
 }
 if(isset($_POST['remove_teacher'])){
@@ -339,15 +339,13 @@ if(isset($_POST['student-test-permission'])){
 }
 if(isset($_POST['edit_group_info'])){
 	try {
-		$stmt = $conn->prepare("UPDATE group_info SET subject_num = :subject_num, teacher_num = :teacher_num, group_name = :group_name, comment = :comment WHERE group_info_num = :group_info_num");
+		$stmt = $conn->prepare("UPDATE group_info SET teacher_num = :teacher_num, group_name = :group_name, comment = :comment WHERE group_info_num = :group_info_num");
 
-	   	$stmt->bindParam(':subject_num', $subject_num, PDO::PARAM_STR);
 	   	$stmt->bindParam(':group_name', $group_name, PDO::PARAM_STR);
 	   	$stmt->bindParam(':teacher_num', $teacher_num, PDO::PARAM_STR);
 	   	$stmt->bindParam(':comment', $comment, PDO::PARAM_STR);
 	   	$stmt->bindParam(':group_info_num', $group_info_num, PDO::PARAM_STR);
 
-	   	$subject_num = $_POST['group_subject'];
 	   	$group_name = $_POST['group_name'];
 	   	$teacher_num = $_POST['group_teacher'];
 	   	$comment = $_POST['group_comment'];
@@ -776,6 +774,19 @@ else if(isset($_POST['student_no_payment'])){
 	try {
 		$student_num = $_POST['data_num'];
 		$payment_block = 2;
+		$stmt = $conn->prepare("UPDATE student SET block = :block WHERE student_num = :student_num");
+		$stmt->bindParam(':student_num', $student_num, PDO::PARAM_STR);
+		$stmt->bindParam(':block', $payment_block, PDO::PARAM_INT);
+		$stmt->execute();
+		header('location:index.php');
+	} catch (PDOException $e) {
+		echo "Error: " . $e->getMessage();
+	}
+}
+else if(isset($_POST['student_no_contract'])){
+	try {
+		$student_num = $_POST['data_num'];
+		$payment_block = 4;
 		$stmt = $conn->prepare("UPDATE student SET block = :block WHERE student_num = :student_num");
 		$stmt->bindParam(':student_num', $student_num, PDO::PARAM_STR);
 		$stmt->bindParam(':block', $payment_block, PDO::PARAM_INT);

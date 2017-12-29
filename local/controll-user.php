@@ -5,7 +5,7 @@ if(isset($_POST['signIn'])){
 	try {
 		$username = $_POST['username'];
 		$password = md5($_POST['password']); 
-		$stmt = $conn->prepare("SELECT * FROM student WHERE username = :username AND password = :password AND (block = 0 OR block = 2)");
+		$stmt = $conn->prepare("SELECT * FROM student WHERE username = :username AND password = :password AND block != 1");
 		$stmt->bindParam(':username', $username, PDO::PARAM_STR);
 		$stmt->bindParam(':password', $password, PDO::PARAM_STR);
 		// echo $password;
@@ -28,38 +28,38 @@ if(isset($_POST['signIn'])){
 			$_SESSION['news_res_student'] = $news_res;
 			$_SESSION['news_notificaiton_student'] = 'true';
 		}
-
-	    // foreach($result as $readrow){
-	    	if(isset($readrow['student_num'])){
-	    		if($readrow['block']==0){
-				    $_SESSION['student_name'] = $readrow['name'];
-				    $_SESSION['student_surname'] = $readrow['surname'];
-		    		if($readrow['password_type']=='default'){
-		    			$_SESSION['default_student_num'] = $readrow['student_num'];
-		    			header('location:reset.php');
-		    		}
-		    		else{
-		    			$_SESSION['student_num'] = $readrow['student_num'];
-		    			$stmt = $conn->prepare("SELECT content FROM news WHERE type = :student_num AND readed = 0");
-						$stmt->bindParam(':student_num', $readrow['student_num'], PDO::PARAM_STR);
-						$stmt->execute();
-						$ccc = $stmt->rowCount();
-						$news_res = $stmt->fetch(PDO::FETCH_ASSOC);
-						if($ccc==1){
-							$_SESSION['news_res_self_student'] = $news_res;
-							$_SESSION['news_notificaiton_self_student'] = 'true';
-						}
-					 	header('location:index.php');
-				    }
-				}
-				else if($readrow['block']==2){
-					header('location:signin.php?noPayment');
-				}
-		    }
-		    else{
-	    		header('location:signin.php');
-	    	}
-	    // } 
+    	if(isset($readrow['student_num'])){
+    		if($readrow['block']==0 || ($readrow['block']==3 && date("Y-m-d")==date('Y-m-d',strtotime($readrow['block_date']))) || ($readrow['block']==5 && date("Y-m-d")==date('Y-m-d',strtotime($readrow['block_date'])))){
+			    $_SESSION['student_name'] = $readrow['name'];
+			    $_SESSION['student_surname'] = $readrow['surname'];
+	    		if($readrow['password_type']=='default'){
+	    			$_SESSION['default_student_num'] = $readrow['student_num'];
+	    			header('location:reset.php');
+	    		}
+	    		else{
+	    			$_SESSION['student_num'] = $readrow['student_num'];
+	    			$stmt = $conn->prepare("SELECT content FROM news WHERE type = :student_num AND readed = 0");
+					$stmt->bindParam(':student_num', $readrow['student_num'], PDO::PARAM_STR);
+					$stmt->execute();
+					$ccc = $stmt->rowCount();
+					$news_res = $stmt->fetch(PDO::FETCH_ASSOC);
+					if($ccc==1){
+						$_SESSION['news_res_self_student'] = $news_res;
+						$_SESSION['news_notificaiton_self_student'] = 'true';
+					}
+				 	header('location:index.php');
+			    }
+			}
+			else if($readrow['block']==2 || ($readrow['block']==3 && date("Y-m-d")!=date('Y-m-d',$readrow['block_date']))){
+				header('location:signin.php?noPayment');
+			}
+			else if($readrow['block']==4 || ($readrow['block']==5 && date("Y-m-d")!=date('Y-m-d',$readrow['block_date']))){
+				header('location:signin.php?noContract');
+			}
+	    }
+	    else{
+    		header('location:signin.php');
+    	} 
 	} catch (PDOException $e) {
 		echo "Error : ".$e->getMessage()." !!!";
 	}

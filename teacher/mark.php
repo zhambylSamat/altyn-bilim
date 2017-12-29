@@ -143,8 +143,10 @@
 					if($value['attendance']==1){
 						$total_attendance++;
 						$visited++;
-						$total_home_work++;
-						$done += $value['home_work'];
+						if($value['home_work']!=-0.1){
+							$total_home_work++;
+						}
+						$done += ($value['home_work']==-0.1) ? 0 : $value['home_work'];
 					}
 					else if($value['attendance']!=null){
 						$total_attendance++;
@@ -198,7 +200,7 @@
 					<center>
 						<?php
 							if($value['attendance']!=null){
-								echo "<b>".$home_work_element."</b>";
+								echo "<b>".(($home_work_element==-0.1) ? "N/A" : $home_work_element)."</b>";
 							}
 							else if(!$new_marks){
 								echo "-";
@@ -212,13 +214,13 @@
 				?>
 				<div class='new-data' style='display: none;'>
 					<div class='form-group'>
-						<input style='width:100%' type='number' name='home_work_mark[<?php echo $count; ?>][]' class='' min='0' max='1' step='0.1' value='<?php echo $home_work_element;?>'>
+						<input style='width:100%' type='number' name='home_work_mark[<?php echo $count; ?>][]' class='' min='-0.1' max='1' step='0.1' value='<?php echo $home_work_element;?>'>
 					</div>
 				</div>
 				<?php }else if($value['attendance']==null){ ?>
 				<div class='new-data' style='display: none;'>
 					<div class='form-group'>
-						<input style='width:100%' type='number' name='new_home_work_mark[<?php echo $count; ?>][]' class='' min='0' max='1' step='0.1' value='<?php echo $home_work_element;?>'>
+						<input style='width:100%' type='number' name='new_home_work_mark[<?php echo $count; ?>][]' class='' min='-0.1' max='1' step='0.1' value='<?php echo $home_work_element;?>'>
 						<input type="hidden" name="new_datas[<?php echo $count; ?>][]" value="<?php echo $value['student_num'];?>">
 						<input type="hidden" name="new_grstdnum[<?php echo $count; ?>][]" value="<?php echo $value['group_student_num'];?>">
 					</div>
@@ -237,7 +239,7 @@
 								<input type='hidden' name='attendance[".$count."][]' value='0'>
 							</center>
 						</td>";
-					echo "<td style='border-right:2px solid #999;' class='not-fix'><div class='form-group'><input style='width:100%' type='number' name='home_work_mark[".$count."][]' class='' min='0' max='1' step='0.1' value='0'></div></td>";
+					echo "<td style='border-right:2px solid #999;' class='not-fix'><div class='form-group'><input style='width:100%' type='number' name='home_work_mark[".$count."][]' class='' min='-0.1' max='1' step='0.1' value='0'></div></td>";
 				}
 				if($count==($col_count) || $new_marks){
 					echo "<td class='fix fix-right'><center>";

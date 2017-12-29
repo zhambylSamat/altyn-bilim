@@ -111,8 +111,10 @@
 				if($value['attendance']==1){
 					$total_attendance++;
 					$visited++;
-					$total_home_work++;
-					$done += $value['home_work'];
+					if($value['home_work']!=-0.1){
+						$total_home_work++;
+					}
+					$done += ($value['home_work']==-0.1) ? 0 : $value['home_work'];
 				}
 				else if($value['attendance']!=null){
 					$total_attendance++;
@@ -133,7 +135,7 @@
 				<center>
 					<?php
 						if($value['attendance']!=null){
-							echo "<b>".$home_work_element."</b>";
+							echo "<b>".(($home_work_element==-0.1) ? "N/A" : $home_work_element)."</b>";
 						}
 						else{
 							echo "-";

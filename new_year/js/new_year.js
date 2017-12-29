@@ -1,3 +1,9 @@
+$(document).ready(function(){
+  $host = "http://"+document.location.hostname+"/altynbilim";
+  $html = "<img class='new-year-icons' id='santa' src='"+$host+"/new_year/img/santa4.png'><img class='new-year-icons' id='tree' src='"+$host+"/new_year/img/tree6.png'>"
+  $("body").append($html);
+});
+
 $(function() {
 var d = function() {};
 $(document).delegate(".b-ball_bounce", "mouseenter", function() {
