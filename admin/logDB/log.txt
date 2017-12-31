@@ -3898,3 +3898,17 @@ Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firef
 --------------------------------------------------------------------------------------
 
 
+--------------------------Admin LogOut---29-12-2017 08:33:21pm------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    29-12-2017 08:34:47pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0...........Mozilla Firefox...........57.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+--------------------------Admin LogOut---29-12-2017 08:35:44pm------------------------------
+
+

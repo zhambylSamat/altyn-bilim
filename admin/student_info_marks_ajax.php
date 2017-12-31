@@ -187,7 +187,7 @@
 				<th><center><?php echo ++$month_count;?></center></th>
 				<td><center><?php echo $month[intval(date("m", strtotime($value['created_date'])))]." ".date("d", strtotime($value['created_date'])); ?></center></td>
 				<td><center><?php echo ($value['attendance']==1) ? "<span class='glyphicon glyphicon-plus text-success'></span>" : "<span class='glyphicon glyphicon-minus text-danger'></span>"; ?></center></td>
-				<td><center><?php echo ($value['attendance']==0) ? "<span class='glyphicon glyphicon-minus text-warning'></span>" : (($value['home_work']==-0.1) ? "<span class='glyphicon glyphicon-minus text-warning'></span>" : $value['home_work']); ?></center></td>
+				<td><center><?php echo ($value['attendance']==0) ? "<span class='glyphicon glyphicon-minus text-warning'></span>" : (($value['home_work']==-0.1) ? "<b>N/A</b>" : $value['home_work']); ?></center></td>
 			</tr>
 		<?php
 			$count++; 
