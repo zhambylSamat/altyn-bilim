@@ -1,5 +1,3 @@
-<link href="../new_year/css/new_year.css" rel="stylesheet">
-<?php include_once('../new_year/new_year.php');?>
 <nav class="navbar navbar-inverse">
   <div class="container">
     <!-- Brand and toggle get grouped for better mobile display -->
@@ -19,4 +17,3 @@
   </div><!-- /.container-fluid -->
 </nav>
 <?php include_once('js.php');?>
-<script type="text/javascript" src="../new_year/js/new_year.js"></script>  

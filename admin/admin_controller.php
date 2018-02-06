@@ -11,7 +11,7 @@ if(isset($_POST['signIn'])){
 		$username = mb_strtolower($_POST['username']);
 		$password = md5($_POST['password']);
 		$values .= "[Username]: ".$_POST['username'];
-		$values .= "        [Password]: ".md5($_POST['password']);
+		$values .= "[Password]: ".md5($_POST['password']);
 	    $stmt->execute();
 	   	$result = $stmt->fetch(PDO::FETCH_ASSOC);
 	   	$result_count = $stmt->rowCount();
@@ -158,7 +158,7 @@ if(isset($_POST['edit_parent'])){
 	    $stmtA = $conn->prepare($query);
 	    $j = 1;
 	    for($i = 0; $i<count($student_num); $i++){
-	    	$child_num = uniqid('CH',true);
+	    	$child_num = uniqid('CH',true)."_".time();
 	    	$stmtA->bindValue($j++, $child_num, PDO::PARAM_STR);
 	    	$stmtA->bindValue($j++, $parent_num, PDO::PARAM_STR);
 	    	$stmtA->bindValue($j++, $student_num[$i], PDO::PARAM_STR);
@@ -196,7 +196,7 @@ if (isset($_POST['create-new-subject'])) {
 	    $stmt->bindParam(':created_date', $created_date, PDO::PARAM_STR);
 
 	    $created_date = date("Y-m-d H:i:s");
-	    $subject_num = uniqid('S', true);
+	    $subject_num = uniqid('S', true)."_".time();
 	    $name = $_POST['new-subject-name'];
 	       
 	    $stmt->execute();
@@ -227,7 +227,7 @@ if (isset($_POST['create-new-topic'])) {
 		    $stmt->bindParam(':created_date', $created_date, PDO::PARAM_STR);
 		    $stmt->bindParam(':topic_order', $count, PDO::PARAM_STR);
 		    $created_date = date("Y-m-d H:i:s");
-		    $topic_num = uniqid('TQ', true);
+		    $topic_num = uniqid('TQ', true)."_".time();
 		    $name = substr_replace($_POST['new-quiz-name'], '', 0,28);
 		       
 		    $stmt->execute();
@@ -242,7 +242,7 @@ if (isset($_POST['create-new-topic'])) {
 		    $stmt->bindParam(':topic_order', $count, PDO::PARAM_STR);
 
 		    $created_date = date("Y-m-d H:i:s");
-		    $topic_num = uniqid('T', true);
+		    $topic_num = uniqid('T', true)."_".time();
 		    $name = $_POST['new-topic-name'];
 		       
 		    $stmt->execute();
@@ -274,7 +274,7 @@ if (isset($_POST['create-new-subtopic'])) {
 	    $stmt->bindParam(':subtopic_order', $count, PDO::PARAM_STR);
 
 	    $created_date = date("Y-m-d H:i:s");
-	    $subtopic_num = uniqid('S_T', true);
+	    $subtopic_num = uniqid('S_T', true)."_".time();
 	    $name = $_POST['new-subtopic-name'];
 	       
 	    $stmt->execute();
@@ -291,7 +291,7 @@ if(isset($_POST['student-test-permission'])){
 	    $stmt->bindParam(':student_permission_num', $student_permission_num, PDO::PARAM_STR);
 	    $stmt->bindParam(':student_num', $student_num, PDO::PARAM_STR);
 
-	    $student_permission_num = uniqid('S_P', true);
+	    $student_permission_num = uniqid('S_P', true)."_".time();
 	    $student_num = $_POST['student-test-permission-student-num'];
 
 	    $stmt->execute();
@@ -386,19 +386,22 @@ if(isset($_POST['add_to_group'])){
 	try {
 		$data_num = $_POST['data_num'];
 		$students = $_POST['students_to_group'];
+		$start_date = date("Y-m-d");
 
-		$query = "INSERT INTO group_student (group_student_num, group_info_num, student_num) VALUES";
-	    $qPart = array_fill(0, count($students), "(?, ?, ?)");
+		$query = "INSERT INTO group_student (group_student_num, group_info_num, student_num, start_date) VALUES";
+	    $qPart = array_fill(0, count($students), "(?, ?, ?, ?)");
 	    $query .= implode(",",$qPart);
 	    $stmtA = $conn->prepare($query);
 	    $j = 1;
 	    $dataMessage1 = '';
 	    $dataMessage2 = '';
+
 	    for($i = 0; $i<count($students); $i++){
-	    	$group_student_num = uniqid('GS', true);
+	    	$group_student_num = uniqid('GS', true)."_".time();
 	    	$stmtA->bindValue($j++, $group_student_num, PDO::PARAM_STR);
 	    	$stmtA->bindValue($j++, $data_num, PDO::PARAM_STR);
 	    	$stmtA->bindValue($j++, $students[$i], PDO::PARAM_STR);
+	    	$stmtA->bindValue($j++, $start_date, PDO::PARAM_STR);
 	    	$dataMessage1 .= "[".$group_student_num."] ";
 	    	$dataMessage2 .= "[".$students[$i]."] ";
 	    }
@@ -562,7 +565,7 @@ if(isset($_POST['transfer_student'])){
 		$new_group_num = $_POST['new_gr'];
 		$student_num = $_POST['std_num'];
 		$old_group_num = $_POST['gr_num'];
-		$transfer_num = uniqid("TR",true);
+		$transfer_num = uniqid("TR",true)."_".time();
 		echo '1.5';
 		$count = 0;
 		$stmt = $conn->prepare("SELECT count(*) n FROM transfer WHERE new_group_info_num = :new_group_info_num AND old_group_info_num = :old_group_info_num AND student_num = :student_num");
@@ -613,7 +616,7 @@ if(isset($_POST['comment_for_teacher'])){
 		    $dataMessage1 = '';
 		    $dataMessage2 = '';
 		    for($i = 0; $i<count($review_text); $i++){
-		    	$review_info_num = uniqid('RI', true);
+		    	$review_info_num = uniqid('RI', true)."_".time();
 		    	$stmtA->bindValue($j++, $review_info_num, PDO::PARAM_STR);
 		    	$stmtA->bindValue($j++, $review_text[$i], PDO::PARAM_STR);
 		    }
@@ -663,6 +666,62 @@ if(isset($_POST['comment_for_teacher'])){
 		echo "Error: " . $e->getMessage();
 	}
 }
+
+if(isset($_POST['reason_for_student'])){
+	try {
+		if(isset($_POST['new_reason'])){
+			$reason_text = $_POST['new_reason'];
+			$query = "INSERT INTO reason_info (reason_info_num, reason_text) VALUES";
+		    $qPart = array_fill(0, count($reason_text), "(?, ?)");
+		    $query .= implode(",",$qPart);
+		    $stmtA = $conn->prepare($query);
+		    $j = 1;
+		    $dataMessage1 = '';
+		    $dataMessage2 = '';
+		    for($i = 0; $i<count($reason_text); $i++){
+		    	$reason_info_num = uniqid('RI', true)."_".time();
+		    	$stmtA->bindValue($j++, $reason_info_num, PDO::PARAM_STR);
+		    	$stmtA->bindValue($j++, $reason_text[$i], PDO::PARAM_STR);
+		    }
+		    $stmtA->execute();
+		}
+		if(isset($_POST['rin_remove'])){
+			$reason_info_num = $_POST['rin_remove'];
+
+			$query = 'DELETE FROM student_reason WHERE reason_info_num = ';
+			$qPart = array_fill(0, count($reason_info_num), "?");
+		    $query .= implode(" OR reason_info_num = ",$qPart);
+		    $stmt = $conn->prepare($query);
+		    $j = 1;
+		    for($i = 0; $i<count($reason_info_num); $i++){
+		    	$stmt->bindValue($j++, $reason_info_num[$i], PDO::PARAM_STR);
+		    }
+		    $stmt->execute();
+
+		    $query = 'DELETE FROM reason_info WHERE reason_info_num = ';
+			$qPart = array_fill(0, count($reason_info_num), "?");
+		    $query .= implode(" OR reason_info_num = ",$qPart);
+		    $stmt = $conn->prepare($query);
+		    $j = 1;
+		    for($i = 0; $i<count($reason_info_num); $i++){
+		    	$stmt->bindValue($j++, $reason_info_num[$i], PDO::PARAM_STR);
+		    }
+		    $stmt->execute();
+		}
+		if(isset($_POST['update_reason'])){
+			$reason_text = $_POST['update_reason'];
+			$reason_num = $_POST['rin_update'];
+			$stmt = $conn->prepare("UPDATE reason_info SET reason_text = ? WHERE reason_info_num = ?");
+			for ($i=0; $i < count($reason_num); $i++) {
+				$stmt->execute(array($reason_text[$i], $reason_num[$i]));
+			}
+		}
+		header('location:index.php');
+	} catch (PDOException $e) {
+		echo "Error: " . $e->getMessage();
+	}
+}
+
 if(isset($_POST['submit_prize_notification'])){
 	try {
 		if(isset($_POST['spn'])){
@@ -689,6 +748,25 @@ if(isset($_POST['submit_attendance_notification'])){
 			$query = 'DELETE FROM attendance_notification WHERE attendance_notification_num = ';
 			$qPart = array_fill(0, count($id), "?");
 		    $query .= implode(" OR attendance_notification_num = ",$qPart);
+		    $stmt = $conn->prepare($query);
+		    $j = 1;
+		    for($i = 0; $i<count($id); $i++){
+		    	$stmt->bindValue($j++, $id[$i], PDO::PARAM_STR);
+		    }
+		    $stmt->execute();
+		}
+	    header("location:index.php");
+	} catch (PDOException $e) {
+		echo "Error: " . $e->getMessage();
+	}
+}
+if(isset($_POST['submit_quiz_retake_notification'])){
+	try {
+		if(isset($_POST['quizRetakeNot'])){
+			$id = $_POST['quizRetakeNot'];
+			$query = 'DELETE FROM quiz_retake_notification WHERE id = ';
+			$qPart = array_fill(0, count($id), "?");
+		    $query .= implode(" OR id = ",$qPart);
 		    $stmt = $conn->prepare($query);
 		    $j = 1;
 		    for($i = 0; $i<count($id); $i++){
@@ -909,3 +987,13 @@ function writeToLog($query, $values,$text){
 }
 
 ?>
+
+
+
+
+
+<!-- GS59d2234ede52a5.43576257
+
+PS5a2bcf83171140.36166557
+PS5a42428b1ca733.71439027
+PS5a5a07691cb8b1.30009465 -->

@@ -3,8 +3,12 @@
 	if(!isset($_GET['data_num']) && !isset($_SESSION['teacher_num'])){
 		header('index.php');
 	}
+
+	$lesson = isset($_GET[md5('lesson')]) ? $_GET[md5('lesson')] : md5('false');
+
 	$result_group_info = array();
 	$result_students_group = array();
+	$result_queue_student = array();
 	$students_group_count = 0;
 	$_SESSION['tmp_group_info_num'] = '';;
 	$subject_num = '';
@@ -26,13 +30,28 @@
 	    							(select count(group_student_num) from review r where r.group_student_num = gs.group_student_num) - (select count(review_info_num) from review_info ri where ri.description != 'comment') as c 
 	    						FROM student s, 
 	    							group_student gs 
-	    						WHERE gs.student_num = s.student_num 
+	    						WHERE gs.student_num = s.student_num
+	    							AND gs.start_date <= CURDATE() 
 	    							AND gs.group_info_num = :group_info_num 
-	    							AND s.block != 1 ORDER BY surname, name ASC");
+	    							AND s.block != 1 
+	    						ORDER BY surname, name ASC");
 	    $stmt->bindParam(":group_info_num", $_GET['data_num'], PDO::PARAM_STR);
 	    $stmt->execute();
 	    $result_students_group = $stmt->fetchAll();
 	    $students_group_count = $stmt->rowCount();
+
+	    $stmt = $conn->prepare("SELECT DATE_FORMAT(gs.start_date, '%d.%m.%Y') as start_date,
+	    							s.name,
+	    							s.surname
+	    						FROM student s,
+	    							group_student gs 
+	    						WHERE gs.student_num = s.student_num
+	    							AND gs.start_date > CURDATE() 
+	    							AND gs.group_info_num = :group_info_num
+	    						ORDER BY surname, name ASC");
+	   	$stmt->bindParam(":group_info_num", $_GET['data_num'], PDO::PARAM_STR);
+	    $stmt->execute();
+	    $result_queue_student = $stmt->fetchAll();
 	} catch (PDOException $e) {
 		echo "Error ".$e->getMessage()." !!!";
 	}
@@ -52,6 +71,10 @@
 		}
 		.table-progress .even-tr{
 			background-color: #eee;
+		}
+		.wrong-format{
+			border:2px solid red;
+			box-shadow: 0px 0px 5px red;
 		}
 	</style>
 </head>
@@ -113,6 +136,8 @@
 												<?php echo ($value['c']!=0 && $subject_num!='S5985a7ea3d0ae721486338') ? "<p class='helper'><b style='color:red;'>Коммент жоқ</b></p>" : "" ;?>
 												<span><?php echo ($count++).") ";?></span>
 												<a class='header-student' data-load='n' data-name='student_single' data-num='<?php echo $value['student_num'];?>'><?php echo $value['surname']." ".$value['name']; ?></a>
+												&nbsp;
+												<a href="../parent/student_info.php?data_num=<?php echo $value['student_num'];?>&user=<?php echo md5('tch');?>" target="_blank">[анкетасы]</a>
 											</td>
 											<td>
 												Login: <b><?php echo $value['username'];?></b>
@@ -152,6 +177,25 @@
 								</table>
 							</td>
 						</tr>
+						<tr>
+							<hr>
+							<?php if(!empty($result_queue_student)){ ?>
+							<td colspan='4'>
+								<b>Курсқа жақында келетін студенттер.</b>
+								<table class='table'>
+									<?php 
+										$count = 1;
+										foreach ($result_queue_student as $value) {
+									?>
+									<tr>
+										<td><?php echo ($count++).") ".$value['surname']." ".$value['name'];?></td>
+										<td>Курсқа келетін уақыты: <?php echo $value['start_date'];?></td>
+									</tr>
+									<?php } ?>
+								</table>
+							</td>
+							<?php } ?>
+						</tr>
 					</table>
 				</div>
 			</div>
@@ -182,7 +226,7 @@
 						</table>
 					</center>
 					<?php
-						$month = array("","Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь");
+						$month = array("","Қаңтар","Ақпан","Наурыз","Сәуір","Мамыр","Мусым","Шілде","Тамыз","Қыркүйек","Қазан","Қараша","Желтоқсан");
 						try {
 							$stmt = $conn->prepare("SELECT DISTINCT DATE_FORMAT(created_date,'%Y-%m') as month FROM progress_group WHERE group_info_num = :group_info_num ORDER BY month ASC");
 							$stmt->bindParam(':group_info_num', $_GET['data_num'], PDO::PARAM_STR);
@@ -206,7 +250,7 @@
 						<button class='btn btn-sm <?php echo $class;?> month_for_marks exists-month' date-number="<?php echo $current_month_n;?>" date-text = "<?php echo $current_month_s;?>"><?php echo $current_month_s; ?></button>
 						<?php } ?>
 						<?php
-							if(intval(date('m'))>intval(substr($current_month_n,5,2)) || $i==0){
+							if(intval(date('m'))!=intval(substr($current_month_n,5,2)) || $i==0){
 						?>
 						<button class='btn btn-sm btn-default month_for_marks' data-name='new' date-number="<?php echo date('Y-m');?>" date-text="<?php echo $month[intval(date('m'))];?>"><?php echo $month[intval(date('m'))]; ?></button>
 						<?php }?>
@@ -306,6 +350,19 @@
     </div>
   </div>
 </div>
+<div class="modal fade box-time-notification" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+    	<div class="modal-header">
+    		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">X</span></button>
+    		<br>
+    		<center><h3 class="modal-title"></h3></center>
+    	</div>
+    	<div class="modal-body">
+    	</div> 
+    </div>
+  </div>
+</div>
 <div id='lll'>
 	<center>
 		<img src="../img/loader.gif" style='width: 10%; margin-top:25%;'>
@@ -400,7 +457,7 @@
 		$thisParent = $(this).parents('.head-student');
 		if($data_load=='n'){
 			$thisParent.after('<tr class="body-student" style="cursor:pointer; border:1px solid lightgray; padding:2px 20px; border-top:none"><td cospan="5">Loading...</td></div>');
-			$thisParent.next().load("student_permission.php?data_num="+$data_num+"&status="+$data_name+"&extra_num=<?php echo $result_group_info['subject_num'];?>");
+			$thisParent.next().load("student_permission.php?data_num="+$data_num+"&status="+$data_name+"&extra_num=<?php echo $result_group_info['subject_num'];?>&<?php echo md5('lesson').'='.$lesson;?>");
 			$(this).attr('data-load','y')
 		}
 		else if($data_load=='y'){
@@ -793,6 +850,53 @@
 	   	});
 	}));
 	//-------------------------------END-COMMENT-FOR-TEACHER--------------------------------------------- 
+
+	$worker = new Worker("js/alert_timer.js");
+	$time_arr = [];
+	$(document).ready(function(){
+		$.ajax({
+	    	url: "load_schedule_time.php",
+			cache : false,
+			success: function(dataS){
+		    	// console.log(dataS);
+		    	data = $.parseJSON(dataS);
+		    	// console.log(data);
+		    	if(data.success){
+		    		$time_arr = data.data;
+		    		console.log($time_arr);
+					timeNotification();
+		    	}
+		    },
+		  	error: function(dataS) 
+	    	{
+	    		console.log("ERROR: ");
+	    		console.log(dataS);
+	    	} 	        
+	   	});
+	});
+
+	function timeNotification(){
+		if(typeof(Worker) !== "undefined"){
+			// for ($i = 0; $i < $time_arr.length; $i++) {
+				$i = 0;
+				if($time_arr.length > 0 && $time_arr[$i]!=""){
+					$worker.postMessage($time_arr[$i]);
+					$time_arr[$i] = "";
+					console.log($time_arr[$i]);
+					// break;
+				}
+			// }
+		}
+	}
+
+	$worker.onmessage = function(e){
+		if(e.data=='show'){
+		$(".box-time-notification .modal-title").html("<center><h2><b>Ұмытпа!</b></h2></center>");
+		$(".box-time-notification .modal-body").html("<center><h3>1. Оқушыға қол қоюға журналды бер!<br>2. Пробный тесттен жинаған балдарды жазып ал!<br>3. Порталдағы журналды белгіле, бағаларын қой!</h3></center>");
+		$(".box-time-notification").modal(e.data);
+		// timeNotification();
+		}
+	}
 </script>
 </body>
 </html>

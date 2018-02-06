@@ -19,12 +19,26 @@
 			$group_info_nums .= $value['group_info_num']."','";
 		}
 		$group_info_nums.=$group_info_num."'";
-		$stmt = $conn->prepare("SELECT pg.created_date created_date, ps.attendance attendance, ps.home_work home_work 
-								FROM progress_group pg, progress_student ps
+		// $stmt = $conn->prepare("SELECT pg.created_date created_date, ps.attendance attendance, ps.home_work home_work 
+		// 						FROM progress_group pg, progress_student ps
+		// 						WHERE pg.group_info_num in ($group_info_nums)
+		// 						    AND pg.progress_group_num = ps.progress_group_num
+		// 						    AND ps.student_num = :student_num
+		// 						    ORDER BY YEAR(pg.created_date) DESC, MONTH(pg.created_date) DESC, pg.created_date ASC");
+		$stmt = $conn->prepare("SELECT pg.created_date created_date, 
+									ps.attendance attendance, 
+								    ps.home_work home_work,
+								    ri.reason_text
+								FROM progress_group pg
+								    INNER JOIN progress_student ps
+								        ON pg.progress_group_num = ps.progress_group_num
+								            AND ps.student_num = :student_num
+									LEFT JOIN student_reason sr
+								    	ON ps.progress_student_num = sr.progress_student_num
+								    LEFT JOIN reason_info ri
+								    	ON ri.reason_info_num = sr.reason_info_num
 								WHERE pg.group_info_num in ($group_info_nums)
-								    AND pg.progress_group_num = ps.progress_group_num
-								    AND ps.student_num = :student_num
-								    ORDER BY YEAR(pg.created_date) DESC, MONTH(pg.created_date) DESC, pg.created_date ASC");
+								ORDER BY YEAR(pg.created_date) DESC, MONTH(pg.created_date) DESC, pg.created_date ASC");
 		$stmt->bindParam(':student_num', $student_num, PDO::PARAM_STR);
 		$stmt->execute();
 		$result_marks = $stmt->fetchAll();
@@ -61,7 +75,7 @@
 
 
 
-		$month_txt = array("","Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь");
+		$month_txt = array("","Қаңтар","Ақпан","Наурыз","Сәуір","Мамыр","Мусым","Шілде","Тамыз","Қыркүйек","Қазан","Қараша","Желтоқсан");
 		$stmt = $conn->prepare("SELECT name, surname FROM student WHERE student_num = :student_num");
 		$stmt->bindParam(':student_num', $student_num, PDO::PARAM_STR);
 		$stmt->execute();
@@ -121,12 +135,13 @@
 				<th><center>Үй жұмысы</center></th>
 			</tr>
 		<?php
-			$month = array("","Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь");
+			$month = array("","Қаңтар","Ақпан","Наурыз","Сәуір","Мамыр","Мусым","Шілде","Тамыз","Қыркүйек","Қазан","Қараша","Желтоқсан");
 			$count = 0;
 			$total_attendance = 0.0;
 			$total_home_work = 0.0;
 			$attendance = 0.0;
 			$home_work = 0.0;
+			$home_work_availability = 0;
 			$current_month = '';
 			$date = '';
 			$month_count = 0;
@@ -147,22 +162,24 @@
 				if($count!=0){
 					$result_attendance = ($attendance==0.0) ? 0 : round(($attendance/$total_attendance)*100,2); 
 					$result_marks = ($home_work==0.0) ? 0 : round(($home_work/$total_home_work)*100,2);
+					// $result_marks = ($home_work==0.0) ? 0 : round(($home_work/$total_home_work)*100,2);
 			?>
 			<tr>
 				<th><center>Қорытынды</center></th>
 				<th><center><?php echo $month[intval($date)]; ?></center></th>
 				<th><center><?php echo $result_attendance; ?>%</center></th>
-				<th><center><?php echo $result_marks; ?>%</center></th>
+				<th><center><?php echo ($home_work_availability==0) ? "N/A" : $result_marks."%"; ?></center></th>
 			</tr>
 			<?php
 				$total_attendance = 0.0;
 				$total_home_work = 0.0;
 				$attendance = 0.0;
 				$home_work = 0.0; 
+				$home_work_availability = 0;
 				} 
 			?>
 			<tr>
-				<td colspan='4s'>
+				<td colspan='4'>
 					<center>
 						<button class='mnth btn btn-xs btn-<?php echo $class;?>' style='width: 100%;'>
 							<h4><?php echo $month[intval(date("m", strtotime($value['created_date'])))]; ?></h4>
@@ -174,32 +191,41 @@
 				}
 				$total_attendance++;
 				$attendance = ($value['attendance']==1) ? $attendance+1 : $attendance;
-				if($value['attendance']==1 && $value['home_work']!=-0.1){
-					$total_home_work++;	
-				}
-				// $home_work = ($value['home_work']!=0) ? $home_work+$value['home_work'] : $home_work;
-				if($value['home_work']!=0 && $value['home_work']!=-0.1){
-					$home_work = $home_work+$value['home_work'];
+				if($value['home_work']!=-0.1){
+					
+					if($value['attendance']==1){
+						$home_work_availability++;
+						$total_home_work++;	
+					}
+					if($value['home_work']!=0){
+						$home_work = $home_work+$value['home_work'];
+					}
 				}
 				$date = date("m", strtotime($value['created_date']));
 		?>
 			<tr style="display:<?php echo $display;?>;" class='<?php echo $month[intval(date("m", strtotime($value['created_date'])))]; ?>'>
 				<th><center><?php echo ++$month_count;?></center></th>
 				<td><center><?php echo $month[intval(date("m", strtotime($value['created_date'])))]." ".date("d", strtotime($value['created_date'])); ?></center></td>
-				<td><center><?php echo ($value['attendance']==1) ? "<span class='glyphicon glyphicon-plus text-success'></span>" : "<span class='glyphicon glyphicon-minus text-danger'></span>"; ?></center></td>
+				<td>
+					<center>
+						<?php echo ($value['attendance']==1) ? "<span class='glyphicon glyphicon-plus text-success'></span>" : "<span class='glyphicon glyphicon-minus text-danger'></span>"; ?>
+						<?php echo ($value['reason_text']!='') ? "<p style='margin:0;'>".substr($value['reason_text'], 2)."</p>" : "" ;?>
+					</center>
+				</td>
 				<td><center><?php echo ($value['attendance']==0) ? "<span class='glyphicon glyphicon-minus text-warning'></span>" : (($value['home_work']==-0.1) ? "<b>N/A</b>" : $value['home_work']); ?></center></td>
 			</tr>
 		<?php
 			$count++; 
 			}
 			$result_attendance = ($attendance==0.0) ? 0 : round(($attendance/$total_attendance)*100,2); 
+			// echo $home_work_availability;
 			$result_marks = ($home_work==0.0) ? 0 : round(($home_work/$total_home_work)*100,2);
 		?>
 		<tr>
 			<th><center>Қорытынды</center></th>
 			<th><center><?php echo $month[intval($date)]; ?></center></th>
 			<th><center><?php echo $result_attendance; ?>%</center></th>
-			<th><center><?php echo $result_marks; ?>%</center></th>
+			<th><center><?php echo ($home_work_availability==0) ? "N/A" : $result_marks."%"; ?></center></th>
 		</tr>
 		</table>
 	</div>

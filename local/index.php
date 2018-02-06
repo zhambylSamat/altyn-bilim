@@ -1,7 +1,7 @@
 
 <?php
 	include_once('../connection.php');
-	if(!isset($_SESSION['student_num'])){
+	if(!isset($_SESSION['student_num']) || (isset($_SESSION['access']) && $_SESSION['access']==md5('false'))){
 		header('location:signin.php');
 	}
 ?>
@@ -452,6 +452,26 @@
 		}
 	});
 
+
+
+	function load_vimeo_video(link){
+		console.log(link);
+		$.ajax({
+	    	url: "https://vimeo.com/api/oembed.json?url="+link,
+			type: "GET",
+			beforeSend:function(){
+				$('#lll').css('display','block');
+			},
+			success: function(data){
+		    	$('#lll').css('display','none');
+		    	$('#video').append("<div class='vimeo_video'><center>"+data.html+"</div><hr>");
+		    },
+		  	error: function(dataS) 
+	    	{
+	    		console.log(dataS);
+	    	} 	     
+	   	});
+	}
 </script>
 </body>
 </html>

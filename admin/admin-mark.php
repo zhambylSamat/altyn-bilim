@@ -3,10 +3,16 @@
 	try {
 		$date_number = isset($_GET['date_number']) ? $_GET['date_number'] : $current_month_n;
 		$date_text = isset($_GET['date_text']) ? $_GET['date_text'] : $current_month_s;
- 		$stmt = $conn->prepare("SELECT gs.student_num student_num, s.name name, s.surname surname, pg.created_date created_date, ps.attendance attendance, ps.home_work home_work 
+ 		$stmt = $conn->prepare("SELECT gs.student_num student_num, 
+ 									s.name name, 
+ 									s.surname surname, 
+ 									pg.created_date created_date, 
+ 									ps.attendance attendance, 
+ 									ps.home_work home_work 
 								FROM group_info gi
 							    	INNER JOIN group_student gs 
 							        	ON gs.group_info_num = gi.group_info_num
+							        		AND gs.start_date <= CURDATE()
 							        INNER JOIN student s
 							        	ON s.student_num = gs.student_num
 							        		AND s.block = 0

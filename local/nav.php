@@ -1,38 +1,38 @@
 <?php
   try {
     include('../connection.php');
-    $news_type = "student";
-    $stmt = $conn->prepare("SELECT * FROM news WHERE type = :type");
-    $stmt->bindParam(':type', $news_type, PDO::PARAM_STR);
-    $stmt->execute();
-    $news_res = $stmt->fetch(PDO::FETCH_ASSOC);
-    $date = date("Y-m-d",strtotime(date("Y-m-d")."-7 days"));
-    if($news_res['publish']==1 && $news_res['last_updated_date']>$date && ((isset($news_res['header']) && $news_res['header']!='') || (isset($news_res['content']) && $news_res['content']!='') || (isset($news_res['img']) && $news_res['img']!=''))){
-      $_SESSION['news_res_student'] = $news_res;
-      $_SESSION['news_notificaiton_student2'] = 'true';
-    }
-    else {
-      $_SESSION['news_notificaiton_student2'] = 'false';
-    }
+    if(isset($_SESSION['access']) && $_SESSION['access']==md5('true')){
+      $news_type = "student";
+      $stmt = $conn->prepare("SELECT * FROM news WHERE type = :type");
+      $stmt->bindParam(':type', $news_type, PDO::PARAM_STR);
+      $stmt->execute();
+      $news_res = $stmt->fetch(PDO::FETCH_ASSOC);
+      $date = date("Y-m-d",strtotime(date("Y-m-d")."-7 days"));
+      if($news_res['publish']==1 && $news_res['last_updated_date']>$date && ((isset($news_res['header']) && $news_res['header']!='') || (isset($news_res['content']) && $news_res['content']!='') || (isset($news_res['img']) && $news_res['img']!=''))){
+        $_SESSION['news_res_student'] = $news_res;
+        $_SESSION['news_notificaiton_student2'] = 'true';
+      }
+      else {
+        $_SESSION['news_notificaiton_student2'] = 'false';
+      }
 
-    $stmt = $conn->prepare("SELECT content FROM news WHERE type = :student_num AND readed = 0");
-    $stmt->bindParam(':student_num', $_SESSION['student_num'], PDO::PARAM_STR);
-    $stmt->execute();
-    $news_res = $stmt->fetch(PDO::FETCH_ASSOC);
-    $ccc = $stmt->rowCount();
-    if($ccc==1){
-      $_SESSION['news_res_self_student'] = $news_res;
-      $_SESSION['news_notificaiton_self_student2'] = 'true';
-    }
-    else {
-      $_SESSION['news_notificaiton_self_student2'] = 'false'; 
+      $stmt = $conn->prepare("SELECT content FROM news WHERE type = :student_num AND readed = 0");
+      $stmt->bindParam(':student_num', $_SESSION['student_num'], PDO::PARAM_STR);
+      $stmt->execute();
+      $news_res = $stmt->fetch(PDO::FETCH_ASSOC);
+      $ccc = $stmt->rowCount();
+      if($ccc==1){
+        $_SESSION['news_res_self_student'] = $news_res;
+        $_SESSION['news_notificaiton_self_student2'] = 'true';
+      }
+      else {
+        $_SESSION['news_notificaiton_self_student2'] = 'false'; 
+      }
     }
   } catch (PDOException $e) {
     echo "Error : ".$e->getMessage()." !!!";
   }
 ?>
-<link href="../new_year/css/new_year.css" rel="stylesheet">
-<?php include_once('../new_year/new_year.php');?>
 <nav class="navbar navbar-inverse">
   <div class="container">
     <!-- Brand and toggle get grouped for better mobile display -->
@@ -50,14 +50,17 @@
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
         <!-- <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li> -->
-        <?php if(!isset($_GET['user']) || $_GET['user']!=md5('std')){ ?>
+        <?php 
+          if(isset($_SESSION['access']) && $_SESSION['access']==md5('true')){
+           if(!isset($_GET['user']) || $_GET['user']!=md5('std')){ 
+        ?>
         <li><a href="../parent/student_info.php?data_num=<?php echo $_SESSION['student_num'];?>&user=<?php echo md5('std');?>" target="_blank"><button style='width: 150px;' class='btn btn-md btn-info'>Оқушының үлгерімі</button></a></li>
         <?php } ?>
         <li>
           <a data-toggle='modal' data-target='.box-schedule' data-type='schedule'><button class='btn btn-md btn-success'>Сабақ кестесі</button></a>
         </li>
         <?php if((isset($_SESSION['news_notificaiton_student2']) && $_SESSION['news_notificaiton_student2']=='true')){?><li><a><button class='btn btn-md btn-info news' data-toggle='modal' data-target='.box-news' data-type='student' style='width: 150px;'>Жалпы жаңалықтар</button></a></li><?php }?>
-        <?php if(isset($_SESSION['news_notificaiton_self_student2']) && $_SESSION['news_notificaiton_self_student2']=='true'){?><li><a><button class='btn btn-md btn-info single-news' data-toggle='modal' data-target='.box-self-news' data-type='student' style='width: 150px;'>Жеке хабарлама</button></a></li><?php }?>
+        <?php if(isset($_SESSION['news_notificaiton_self_student2']) && $_SESSION['news_notificaiton_self_student2']=='true'){?><li><a><button class='btn btn-md btn-info single-news' data-toggle='modal' data-target='.box-self-news' data-type='student' style='width: 150px;'>Жеке хабарлама</button></a></li><?php } } ?>
         <!-- <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
           <ul class="dropdown-menu">
@@ -84,4 +87,3 @@
   </div><!-- /.container-fluid -->
 </nav>
 <?php include_once('js.php');?>
-<script type="text/javascript" src="../new_year/js/new_year.js"></script>  

@@ -7,7 +7,7 @@
 <button class='btn btn-success btn-sm new-teacher' at='new-teacher' id='new-teacher-btn'>Мұғалім енгізу</button>
 <button class='btn btn-info btn-sm comment-for-teacher' at='comment-for-teacher' data-toggle='modal' data-target='.box-comment-for-teacher' id='new-teachcer-btn'><span class='glyphicon glyphicon-th-list'></span></button>
 <a class='btn btn-sm btn-default news' data-toggle='modal' data-target='.box-news' data-type='teacher'>Жаңалықтар (Мұғалім)</a>
-<button class='btn btn-success btn-sm btn-suggestion' data-toggle='modal' data-target='.box-suggestion'>Ұсыныс</button>
+<button class='btn btn-success btn-sm <?php echo $_SESSION['role']==md5('admin') ? 'btn-suggestion' : 'suggestion' ; ?>' data-toggle='modal' data-target='.box-suggestion'>Ұсыныс</button>
 <div id='new-teacher'>
 	<form class='form-inline' id='create-teacher' method='post'>
 		<div class="form-group">

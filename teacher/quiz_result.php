@@ -20,6 +20,7 @@
 					FROM group_info gi
 				    	INNER JOIN group_student gs 
 							ON gs.group_info_num = gi.group_info_num
+								AND gs.start_date <= CURDATE()
 						INNER JOIN student s
 							ON s.student_num = gs.student_num
 				        LEFT JOIN quiz q
@@ -100,7 +101,7 @@
 							}
 							$quiz_status = ($value['quiz_num']==null) ? "new" : $value['quiz_num'];
 							if($student_num!=$value['student_num']){
-								if($count!=0 && (($last_mark<70.0 && $last_mark>0) || ($last_mark_practice<70.0 && $last_mark_practice>0))){
+								if($count!=0 && $count<2 && (($last_mark<70.0 && $last_mark>0) || ($last_mark_practice<70.0 && $last_mark_practice>0))){
 									if($count>0){
 										echo "<b style='color:red;'>Пересдача:</b><br>";
 									}
@@ -197,7 +198,7 @@
 						} 
 					?>
 					<?php 
-						if($count!=0 && (($last_mark<70.0 && $last_mark>0) || ($last_mark_practice<70.0 && $last_mark_practice>0))){ 
+						if($count!=0 && $count<2 && (($last_mark<70.0 && $last_mark>0) || ($last_mark_practice<70.0 && $last_mark_practice>0))){ 
 							if($count>0){
 								echo "<b style='color:red;'>Пересдача:</b><br>";
 							}

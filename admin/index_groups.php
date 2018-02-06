@@ -3,10 +3,33 @@
 	include('../connection.php');
 	if(!isset($_GET['search']) || $_GET['search']==''){ 
 		try {
-			$stmt = $conn->prepare("SELECT gi.group_info_num group_info_num, gi.group_name group_name, gi.comment comment, t.name name, t.surname surname, s.subject_name subject_name, (SELECT count(*) FROM group_student gs, student s WHERE gs.group_info_num = gi.group_info_num AND s.student_num = gs.student_num AND s.block != 1 ) student_quantity FROM group_info gi, teacher t, subject s WHERE gi.teacher_num=t.teacher_num AND gi.subject_num = s.subject_num order by t.surname asc");
+			$stmt = $conn->prepare("SELECT gi.group_info_num,
+										gi.group_name, 
+										gi.comment, 
+										t.name, 
+										t.surname, 
+										s.subject_name,
+										DATE_FORMAT(gi.start_lesson, '%H:%i') as start_lesson,
+										DATE_FORMAT(gi.finish_lesson, '%H:%i') as finish_lesson, 
+										(SELECT count(*) 
+										FROM group_student gs, 
+											student s 
+										WHERE gs.group_info_num = gi.group_info_num 
+											AND gs.start_date <= CURDATE() 
+											AND s.student_num = gs.student_num 
+											AND s.block != 1 ) student_quantity,
+										(SELECT count(sh.schedule_id)
+									    FROM schedule sh
+									    WHERE sh.group_info_num in (gi.group_info_num)) schedule_count
+									FROM group_info gi, 
+										teacher t, 
+										subject s 
+									WHERE gi.teacher_num=t.teacher_num 
+										AND gi.subject_num = s.subject_num 
+									ORDER BY t.surname, t.name, gi.group_name ASC");
 			
 		    $stmt->execute();
-		    $result_group_info = $stmt->fetchAll(); 
+		    $result_group_info = $stmt->fetchAll();
 		    $_SESSION['result_group_info'] = $result_group_info;
 		} catch (PDOException $e) {
 			echo "Error ".$e->getMessage()." !!!";
@@ -26,11 +49,12 @@
 		}
 	}
 ?>
+<div style='background-color:#FFB564; padding:0.1% 0.1%; color:#555; margin:0.5% 0; display: inline-block; font-size: 11px;'><b>*Сабақ кестесі енгізілмеген</b></div>
 <table class="table table-bordered table-hover table-groups-info">
 	<?php
 		foreach ($result_group_info as $value) {
 	?>
-	<tr class='row-groups-info' style='padding:1%;'>
+	<tr class='row-groups-info' style='padding:1%; <?php echo ($value['start_lesson']=="00:00" || $value['finish_lesson']=="00:00" || $value['schedule_count'] == 0) ? "background-color: #FFB564;" : "" ; ?>'>
 		<td style='border-color:black; padding:2% 1% 2% 1%;'>
 			<div class='group-info'>
 				<a href="group.php?data_num=<?php echo $value['group_info_num'];?>">

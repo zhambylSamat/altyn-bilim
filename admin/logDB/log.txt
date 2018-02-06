@@ -3912,3 +3912,334 @@ Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firef
 --------------------------Admin LogOut---29-12-2017 08:35:44pm------------------------------
 
 
+---------------------------------Admin login----------------------------------------------
+Date:    06-01-2018 02:53:28pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0...........Mozilla Firefox...........57.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+--------------------------Admin LogOut---06-01-2018 05:37:55pm------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    06-01-2018 05:37:58pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0...........Mozilla Firefox...........57.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    06-01-2018 07:10:11pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0...........Mozilla Firefox...........57.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+--------------------------Admin LogOut---06-01-2018 07:14:30pm------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    06-01-2018 07:14:33pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0...........Mozilla Firefox...........57.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    06-01-2018 08:25:00pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0...........Mozilla Firefox...........57.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    07-01-2018 01:53:06pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0...........Mozilla Firefox...........57.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    07-01-2018 02:37:03pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0...........Mozilla Firefox...........57.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+--------------------------Admin LogOut---07-01-2018 02:38:40pm------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    07-01-2018 02:38:44pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0...........Mozilla Firefox...........57.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    13-01-2018 06:15:06pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0...........Mozilla Firefox...........57.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+--------------------------Admin LogOut---13-01-2018 07:29:42pm------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    20-01-2018 02:07:05pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0...........Mozilla Firefox...........57.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    20-01-2018 06:37:11pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0...........Mozilla Firefox...........57.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+--------------------------Admin LogOut---20-01-2018 07:18:46pm------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    20-01-2018 07:18:50pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0...........Mozilla Firefox...........57.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    21-01-2018 10:56:33am
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0...........Mozilla Firefox...........57.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+--------------------------Admin LogOut---21-01-2018 11:02:46am------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    21-01-2018 11:02:55am
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0...........Mozilla Firefox...........57.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    22-01-2018 01:57:57pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0...........Mozilla Firefox...........57.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    28-01-2018 07:32:04pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0...........Mozilla Firefox...........57.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    29-01-2018 11:46:57am
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0...........Mozilla Firefox...........57.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    03-02-2018 12:39:37pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36...........Google Chrome...........63.0.3239.132...........windows...........#(?<browser>Version|Chrome|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    03-02-2018 02:09:47pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0...........Mozilla Firefox...........58.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    03-02-2018 03:07:58pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0...........Mozilla Firefox...........58.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+--------------------------Admin LogOut---03-02-2018 04:13:28pm------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    03-02-2018 04:13:31pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0...........Mozilla Firefox...........58.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+--------------------------Admin LogOut---03-02-2018 04:14:01pm------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    03-02-2018 04:14:26pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0...........Mozilla Firefox...........58.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+--------------------------Admin LogOut---03-02-2018 06:07:20pm------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    03-02-2018 06:07:30pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0...........Mozilla Firefox...........58.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    03-02-2018 08:07:16pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl        [Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0...........Mozilla Firefox...........58.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    05-02-2018 01:56:34pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: aizhan[Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0...........Mozilla Firefox...........58.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+--------------------------Admin LogOut---05-02-2018 01:56:57pm------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    05-02-2018 01:57:07pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl[Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0...........Mozilla Firefox...........58.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+--------------------------Admin LogOut---05-02-2018 01:57:24pm------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    05-02-2018 06:37:52pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl[Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0...........Mozilla Firefox...........58.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+--------------------------Admin LogOut---05-02-2018 07:28:08pm------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    05-02-2018 07:28:11pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl[Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0...........Mozilla Firefox...........58.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    05-02-2018 08:32:10pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl[Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0...........Mozilla Firefox...........58.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+--------------------------Admin LogOut---05-02-2018 08:54:28pm------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    05-02-2018 08:54:50pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: aizhan[Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0...........Mozilla Firefox...........58.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+--------------------------Admin LogOut---05-02-2018 08:55:56pm------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    05-02-2018 08:55:59pm
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl[Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0...........Mozilla Firefox...........58.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    06-02-2018 09:39:06am
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl[Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0...........Mozilla Firefox...........58.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+--------------------------Admin LogOut---06-02-2018 09:42:12am------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    06-02-2018 09:42:15am
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl[Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0...........Mozilla Firefox...........58.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+--------------------------Admin LogOut---06-02-2018 09:43:42am------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    06-02-2018 09:43:46am
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: zhambyl[Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0...........Mozilla Firefox...........58.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+
+--------------------------Admin LogOut---06-02-2018 09:46:19am------------------------------
+
+
+---------------------------------Admin login----------------------------------------------
+Date:    06-02-2018 09:46:24am
+Query:   SELECT * FROM admin WHERE username = :username AND password = :password
+Values:  [Username]: aizhan[Password]: abc4ca4415a99f9f46c2260ef69dfa69
+Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0...........Mozilla Firefox...........58.0...........windows...........#(?<browser>Version|Firefox|other)[/ ]+(?<version>[0-9.|a-zA-Z.]*)#
+--------------------------------------------------------------------------------------
+
+

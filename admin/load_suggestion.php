@@ -1,14 +1,30 @@
 <?php
 	include_once('../connection.php');
 	try {
-		$stmt = $conn->prepare("SELECT s.*, t.name, t.surname FROM suggestion s, teacher t where t.teacher_num = s.teacher_num ORDER BY s.status, s.last_changed_date DESC");
+		$stmt = $conn->prepare("SELECT s.suggestion_id, 
+									s.text, 
+									s.status, 
+									s.last_changed_date,
+								    t.teacher_num,
+									t.name t_name, 
+									t.surname t_surname,
+								    a.admin_num,
+									a.name a_name,
+									a.surname a_surname
+								FROM suggestion s
+								LEFT JOIN teacher t 
+									ON t.teacher_num = s.user_num
+								LEFT JOIN admin a
+									ON a.admin_num = s.user_num
+								ORDER BY s.status, 
+									s.last_changed_date DESC");
 		$stmt->execute();
 		$result = $stmt->fetchAll();	
 	} catch (PDOException $e) {
 		echo "Error ".$e->getMessage()." !!!";
 	}
 ?>
-<div id='wait'>
+<div>
 	<h4><b>Жаңа ұсыныстар</b></h4>
 	<form method='post' id='suggestion-wating-form'>
 		<table class='table table-bordered table-striped'>
@@ -27,7 +43,7 @@
 					</center>
 				</td>
 				<td>
-					<b><?php echo $result[$i]['surname']." ".$result[$i]['name'].": ".date('d.m.Y', strtotime($result[$i]['last_changed_date']));?></b>
+					<b><?php echo ($result[$i]['teacher_num']!="" ? $result[$i]['t_surname']." ".$result[$i]['t_name'] : $result[$i]['a_surname']." ".$result[$i]['a_name']).": ".date('d.m.Y', strtotime($result[$i]['last_changed_date']));?></b>
 					<p id='text' style='font-family: "Times New Roman", Times, serif; font-size:15px;'><?php echo nl2br($result[$i]['text']);?></p>
 				</td>
 			</tr>
@@ -63,7 +79,7 @@
 					</center>
 				</td>
 				<td>
-					<b><?php echo $result[$i]['surname']." ".$result[$i]['name'];?></b>
+					<b><?php echo ($result[$i]['teacher_num']!="" ? $result[$i]['t_surname']." ".$result[$i]['t_name'] : $result[$i]['a_surname']." ".$result[$i]['a_name']);?></b>
 					<p id='text' style='font-family: "Times New Roman", Times, serif; font-size:15px;'><?php echo nl2br($result[$i]['text']);?></p>
 				</td>
 			</tr>
@@ -101,7 +117,7 @@
 							$dt = $date->format('Y-m-d');
 							$dt2 = $date2->format('Y-m-d');
 							$interval = date_diff(date_create($dt2), date_create($dt));
-							echo $result[$i]['surname']." ".$result[$i]['name'].":	<span class='text-warning'>".(30-intval($interval->format("%a")))." кун калды</span>";
+							echo ($result[$i]['teacher_num']!="" ? $result[$i]['t_surname']." ".$result[$i]['t_name'] : $result[$i]['a_surname']." ".$result[$i]['a_name']).":	<span class='text-warning'>".(30-intval($interval->format("%a")))." кун калды</span>";
 							?>
 					</b>
 					<p id='text' style='font-family: "Times New Roman", Times, serif; font-size:15px;'><?php echo nl2br($result[$i]['text']);?></p>
@@ -118,5 +134,3 @@
 		<?php } ?>
 	</div>
 </div>
-<div id='accept'></div>
-<div id='done'></div>

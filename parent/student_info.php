@@ -1,9 +1,14 @@
 <?php
 include('../connection.php');
-
+	// echo $_GET['user'];
 	if(isset($_GET['user']) && $_GET['user']==md5('std')){
 		if(!isset($_SESSION['student_num'])){
 			header('location:../local/signin.php');
+		}
+	}
+	else if(isset($_GET['user']) && $_GET['user']==md5('tch')){
+		if(!isset($_SESSION['teacher_num'])){
+			header('location:../teacher/signin.php');	
 		}
 	}
 	else if(!isset($_SESSION['parent_num'])){
@@ -23,7 +28,20 @@ include('../connection.php');
 <body>
 
 <?php 
-include_once((isset($_GET['user']) && $_GET['user']==md5('std')) ? "../local/nav.php" : 'nav.php');
+	if((isset($_GET['user']) && $_GET['user']==md5('std'))){
+		if(isset($_SESSION['student_num'])){
+			include_once("../local/nav.php");
+		}
+		
+	}
+	else if((isset($_GET['user']) && $_GET['user']==md5('tch'))){
+		if(isset($_SESSION['teacher_num'])){
+			include_once("../teacher/nav.php");
+		}
+	}
+	else{
+		include_once("nav.php");
+	}
 ?>
 
 <?php

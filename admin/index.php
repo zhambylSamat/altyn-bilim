@@ -38,7 +38,7 @@
 							        t.topic_name,
 							        qm.mark_theory,
 							        qm.mark_practice,
-							        qm.created_date
+							        DATE_FORMAT(qm.created_date, '%d.%m.%Y') AS created_date
 								FROM student_prize_notification spn,
 									group_info gi,
 						            group_student gs,
@@ -72,17 +72,42 @@
 								    group_student gs,
 								    progress_group pg,
 								    progress_student ps
-								WHERE an.action = 1
+								WHERE an.action = 3
 									AND an.group_student_num = gs.group_student_num
 								    AND gs.group_info_num = gi.group_info_num
-								    AND ps.progress_student_num in (an.first_abs, an.second_abs)
+								    AND ps.progress_student_num in (an.first_abs, an.second_abs, an.third_abs)
 								    AND pg.progress_group_num = ps.progress_group_num
 								    AND ps.student_num = s.student_num
 								ORDER BY s.surname, s.name, gi.group_name, created_date ASC");
 
 	  	$stmt->execute();
 	  	$result_an = $stmt->fetchAll();
-	  	$attendance_notification_count = $stmt->rowCount()/2;
+	  	$attendance_notification_count = $stmt->rowCount()/3;
+	  	// print_r($result_an);
+	  	$stmt = $conn->prepare("SELECT qrn.id,
+	  								st.student_num,
+									st.name,
+								    st.surname,
+								    sj.subject_name,
+								    t.topic_name,
+								    qm.mark_theory,
+								    qm.mark_practice,
+								    DATE_FORMAT(qm.created_date, '%d.%m.%Y') AS created_date
+								FROM subject sj,
+									topic t,
+								    student st,
+								    quiz q,
+								    quiz_mark qm,
+								    quiz_retake_notification qrn
+								WHERE qm.quiz_mark_num in (qrn.retake_1, qrn.retake_2)
+								    AND q.quiz_num = qm.quiz_num
+								    AND t.topic_num = q.topic_num
+								    AND sj.subject_num = t.subject_num
+								    AND st.student_num = qm.student_num");
+	  	$stmt->execute();
+	  	$result_qrn = $stmt->fetchAll();
+	  	$quiz_retake_notification_count = $stmt->rowCount()/2;
+	  	// $quiz_retake_notification_count = 10;
 	} catch (PDOException $e) {
 		echo "Error ".$e->getMessage()." !!!";
 	}
@@ -109,14 +134,13 @@
 		</div>
 	</center>
 	
-	
 <?php include_once('nav.php');?>
 	<section id='body'>
 		<div class='container'>
 			<div class='row'>
 				<div class='col-md-12 col-sm-12'>
 					<ul class="nav nav-tabs">
-					 	<li role="presentation" class="navigation <?php echo ($_SESSION['page']==$pages[0]) ? "active" : "" ;?>" data='student'><a href="#">Студент <span class="label label-success"><?php echo ($prize_count>0) ? $prize_count : ""; ?></span><span class="label label-danger"><?php echo ($attendance_notification_count>0) ? $attendance_notification_count : ""; ?></span></a></li>
+					 	<li role="presentation" class="navigation <?php echo ($_SESSION['page']==$pages[0]) ? "active" : "" ;?>" data='student'><a href="#">Студент <span class="label label-success"><?php echo ($prize_count>0) ? $prize_count : ""; ?></span><span class="label label-danger"><?php echo ($attendance_notification_count>0) ? $attendance_notification_count : ""; ?></span><span class="label label-danger"><?php echo ($quiz_retake_notification_count>0) ? $quiz_retake_notification_count : ""; ?></span></a></li>
 					 	<li role="presentation" class='navigation <?php echo ($_SESSION['page']==$pages[1]) ? "active" : "" ;?>' data='teacher'><a href="#">Мұғалім</a></li>
 					 	<li role="presentation" class='navigation <?php echo ($_SESSION['page']==$pages[2]) ? "active" : "" ;?>' data='subject'><a href="#">Пән</a></li>
 					 	<li role="presentation" class='navigation <?php echo ($_SESSION['page']==$pages[3]) ? "active" : "" ;?>' data='group'><a href="#">Группа</a></li>
@@ -127,6 +151,7 @@
 					<div class='student box' data-test="<?php echo $_SESSION['page'];?>" style='<?php echo ($_SESSION['page']==$pages[0]) ? "display:block;" : "display:none;"?>'>
 						<button class='btn btn-success btn-sm new-student' at='new-student' id='new-student-btn'>Жаңа оқушыны енгізу</button>
 						<a class='btn btn-sm btn-default news' data-toggle='modal' data-target='.box-news' data-type='student'>Жаңалықтар (Студент)</a>
+						<a class='btn btn-sm btn-default abs-reason' data-toggle='modal' data-target='.box-abs-reason' data-type='abs-reason'>Сабаққа келмеу себептері</a>
 						<?php if($prize_count>0){ ?>
 							<a class='btn btn-success btn-sm prize-notification' data-toggle='modal' data-target='.box-prize-notification' data-type='prize-notification'>
 								95 баллдан асқандар
@@ -135,8 +160,14 @@
 						<?php } ?>
 						<?php if($attendance_notification_count>0){ ?>
 							<a class='btn btn-danger btn-sm attendance-notification' data-toggle='modal' data-target='.box-attendance-notification' data-type='attendance-notification'>
-								2 күн қатарынан келмегендер
+								3 күн қатарынан келмегендер
 								<span class='badge'><?php echo $attendance_notification_count; ?></span>
+							</a>
+						<?php } ?>
+						<?php if($quiz_retake_notification_count>0){ ?>
+							<a class='btn btn-danger btn-sm quiz-retake-notification' data-toggle='modal' data-target='.box-quiz-retake-notification' data-type='attendance-notification'>
+								Пересдачадан құлағандар
+								<span class='badge'><?php echo $quiz_retake_notification_count; ?></span>
 							</a>
 						<?php } ?>
 						<div id='new-student'>
@@ -404,7 +435,7 @@
     <div class="modal-content">
     	<div class="modal-header">
     		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">X</span></button>
-    		<center><h3>2 күн қатарынан келмеген оқушылар</h3></center>
+    		<center><h3>3 күн қатарынан келмеген оқушылар</h3></center>
     	</div>
     	<div class="modal-body">
     		<div class='row'>
@@ -413,7 +444,7 @@
 	    				<table class='table table-bordered'>
 	    					<?php
 	    						$count = 0;
-	    						for ($i=0; $i < count($result_an); $i=$i+2) {
+	    						for ($i=0; $i < count($result_an); $i=$i+3) {
 	    					?>
 	    					<tr>
 	    						<td><center><?php echo ++$count; ?></center></td>
@@ -429,14 +460,16 @@
 			    							<span class='h4' style='color:#999;'>Дата 1:</span> <span class='h4 text-danger'><b><?php echo $result_an[$i]['created_date']; ?></b></span>
 			    							&nbsp;&nbsp;<b>|</b>&nbsp;&nbsp;
 			    							<span class='h4' style='color:#999;'>Дата 2:</span> <span class='h4 text-danger'><b><?php echo $result_an[$i+1]['created_date']; ?></b></span>
+			    							&nbsp;&nbsp;<b>|</b>&nbsp;&nbsp;
+			    							<span class='h4' style='color:#999;'>Дата 3:</span> <span class='h4 text-danger'><b><?php echo $result_an[$i+2]['created_date']; ?></b></span>
 			    						</span>
 	    							</center>
 	    						</td>
 	    						<td>
 		    						<center>
 		    							<input type="hidden" name="" value='<?php echo $result_an[$i]['attendance_notification_num'];?>'>
-		    							<a class='btn btn-sm btn-danger' data-action='remove-attendance-notification'>Тізімнен өшіру</a>
-		    							<a class='btn btn-sm btn-warning' data-action='restore-attendance-notification' style='display: none;'>Отмена</a>
+		    							<a class='btn btn-sm btn-danger' data-item='ann' data-action='remove-attendance-notification'>Тізімнен өшіру</a>
+		    							<a class='btn btn-sm btn-warning' data-item='ann' data-action='restore-attendance-notification' style='display: none;'>Отмена</a>
 		    						</center>
 		    					</td>
 	    					</tr>
@@ -444,6 +477,71 @@
 	    				</table>
     					<center>
     						<input type="submit" class='btn btn-sm btn-success' name="submit_attendance_notification" value='Сақтау'>
+    					</center>
+    				</form>
+    			</div>
+    		</div>
+    	</div> 
+    </div>
+  </div>
+</div>
+<div class="modal fade box-quiz-retake-notification" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+    	<div class="modal-header">
+    		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">X</span></button>
+    		<center><h3>Пересдачадан құлағандар</h3></center>
+    	</div>
+    	<div class="modal-body">
+    		<div class='row'>
+    			<div class='col-md-12 col-sm-12'>
+    				<form method='post' action='admin_controller.php'>
+	    				<table class='table table-bordered'>
+	    					<?php
+	    						$count = 0;
+	    						for ($i=0; $i < count($result_qrn); $i=$i+2) {
+	    					?>
+	    					<tr>
+	    						<td><center><?php echo ++$count; ?></center></td>
+	    						<td>
+	    							<center>
+	    								<span>
+			    							<span class='h4'><b><?php echo $result_qrn[$i]['surname']." ".$result_qrn[$i]['name'];?></b></span>
+			    						</span>
+			    						<br>
+			    						<span>
+			    							<span class='h5'>[<?php echo $result_qrn[$i]['subject_name'].", ".$result_qrn[$i]['topic_name']; ?>]</span>
+			    						</span>
+			    						<br>
+			    						<span>
+			    							<span class='h4'>1:</span>
+			    							<?php echo ($result_qrn[$i]['mark_theory']!=0) ? "<span class='h4 ".(($result_qrn[$i]['mark_theory']<70) ? 'text-danger' : '')."'><b>Теория: ".$result_qrn[$i]['mark_theory']."</b></span>&nbsp;&nbsp;" : "";?>
+			    							<span class='h4 <?php echo ($result_qrn[$i]['mark_practice']<70) ? "text-danger" : "" ; ?>'><b><?php echo "Есеп: ".$result_qrn[$i]['mark_practice'];?></b></span>
+			    							&nbsp;&nbsp;
+			    							<span class='h5'>[<?php echo $result_qrn[$i]["created_date"]; ?>]</span>
+			    						</span>
+			    						<br>
+			    						<span>
+			    							<span class='h4'>2:</span>
+			    							<?php echo ($result_qrn[$i+1]['mark_theory']!=0) ? "<span class='h4 ".(($result_qrn[$i+1]['mark_theory']<70) ? 'text-danger' : '')."'><b>Теория: ".$result_qrn[$i+1]['mark_theory']."</b></span>&nbsp;&nbsp;" : "";?>
+			    							<span class='h4 <?php echo ($result_qrn[$i]['mark_practice']<70) ? "text-danger" : "" ; ?>'><b><?php echo "Есеп: ".$result_qrn[$i+1]['mark_practice'];?></b></span>
+			    							&nbsp;&nbsp;
+			    							<span class='h5'>[<?php echo $result_qrn[$i+1]["created_date"]; ?>]</span>
+			    						</span>
+	    							</center>
+	    						</td>
+	    						<td>
+		    						<center>
+		    							<input type="hidden" name="" value='<?php echo $result_qrn[$i]['id'];?>'>
+		    							<a class='btn btn-sm btn-danger' data-item='quizRetakeNot' data-action='remove-quiz-retake-notification'>Тізімнен өшіру</a>
+		    							<a class='btn btn-sm btn-warning' data-item='quizRetakeNot' data-action='restore-quiz-retake-notification' style='display: none;'>Отмена</a>
+		    						</center>
+		    					</td>
+	    					</tr>
+	    					<?php } ?>
+	    				</table>
+    					<center>
+    						<input type="submit" class='btn btn-sm btn-success' name="submit_quiz_retake_notification" value='Сақтау'>
     					</center>
     				</form>
     			</div>
@@ -466,7 +564,7 @@
     </div>
   </div>
 </div>
-<div class="modal fade box-news box-suggestion" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+<div class="modal fade box-news box-suggestion box-abs-reason" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
     	<div class="modal-header">
@@ -490,6 +588,10 @@ $(document).on('click','.add-row-review',function(){
 	$('.modal-body .form-class').append('<div class="form-group" style="display:block;"><label><b></b></label><input type="text" class="form-control" required="" name="new_review[]" placeholder="М: Сабақ үлгерімі.">&nbsp;&nbsp;<a class="btn btn-sm btn-danger" data-action="remove" name="">Удалить</a><a style="display:none;" class="btn btn-sm btn-primary" data-action="restore" name="">Восстановить</a>&nbsp;&nbsp;<a style="display:none;" class="btn btn-sm btn-warning" data-action="reset" name="">Отмена</a></div>');
 	console.log($('.modal-body .form-class').find('.form-group').length);
 });
+$(document).on('click','.add-row-reason',function(){
+	$('.box-abs-reason .modal-body .form-class').append('<div class="form-group" style="display:block;"><label><b></b></label><input type="text" class="form-control" required="" name="new_reason[]" placeholder="М: Ауырып калдым.">&nbsp;&nbsp;<a class="btn btn-sm btn-danger" data-action-reason="remove" name="">Удалить</a><a style="display:none;" class="btn btn-sm btn-primary" data-action-reason="restore" name="">Восстановить</a>&nbsp;&nbsp;<a style="display:none;" class="btn btn-sm btn-warning" data-action-reason="reset" name="">Отмена</a></div>');
+	console.log($('.modal-body .form-class').find('.form-group').length);
+});
 $(document).on('click','a[data-action=remove]',function(){
 	// console.log($(this).parent().find('input').attr('name'));
 	if($(this).parent().find('input').attr('name')=='new_review[]'){
@@ -504,6 +606,19 @@ $(document).on('click','a[data-action=remove]',function(){
 		$(this).parent().find('input[name=review]').attr('name','remove_review[]');
 	}
 });
+$(document).on('click','a[data-action-reason=remove]',function(){
+	if($(this).parent().find('input').attr('name')=='new_reason[]'){
+		$(this).parent().remove();
+	}
+	else if($(this).parent().find('input').attr('name')=='reason'){
+		lightAlert($(this).parent(), '#d9534f', 0.3, 300);
+		$(this).hide();
+		$(this).parent().find('input[type=hidden]').attr('name','rin_remove[]');
+		$(this).parent().find('a[data-action-reason=restore]').show();
+		$(this).parent().find('input[name=reason]').prop( "disabled", true );
+		$(this).parent().find('input[name=reason]').attr('name','remove_reason[]');
+	}
+});
 $(document).on('click','a[data-action=restore]',function(){
 	if($(this).parent().find('input').attr('name')=='remove_review[]'){
 		lightAlert($(this).parent(), '#5cb85c', 0, 300);
@@ -514,6 +629,74 @@ $(document).on('click','a[data-action=restore]',function(){
 		$(this).parent().find('input[name="remove_review[]"]').attr('name','review');
 	}
 });
+$(document).on('click','a[data-action-reason=restore]',function(){
+	if($(this).parent().find('input').attr('name')=='remove_reason[]'){
+		lightAlert($(this).parent(), '#5cb85c', 0, 300);
+		$(this).hide();
+		$(this).parent().find('input[type=hidden]').attr('name','rin[]');
+		$(this).parent().find('a[data-action-reason=remove]').show();
+		$(this).parent().find('input[name="remove_reason[]"]').prop( "disabled", false );
+		$(this).parent().find('input[name="remove_reason[]"]').attr('name','reason');
+	}
+});
+
+$(document).on('keyup','.box-comment-for-teacher .modal-body .form-class input[type=text]',function(){
+	if($(this).val()!=$(this).prop('defaultValue')){
+		$(this).css({'border':"1px solid #F0AD4E","box-shadow":"0px 0px 10px #F0AD4E"});
+		$(this).parent().find('a[data-action=reset]').show();
+		if($(this).parent().find('input').attr('name')=='review'){
+			$(this).parent().find('input[name=review]').attr('name','update_review[]');
+			$(this).parent().find('input[type=hidden]').attr('name','rin_update[]');
+		}
+	}
+	else if($(this).prop('defaultValue')==$(this).val()){
+		$(this).css({"border":"1px solid #ccc","box-shadow":"none"});
+		$(this).parent().find('a[data-action=reset]').hide();
+		if($(this).parent().find('input').attr('name')=='update_review[]'){
+			$(this).parent().find('input[name="update_review[]"]').attr('name','review');
+			$(this).parent().find('input[type=hidden]').attr('name','rin[]');
+		}
+	}
+});
+$(document).on('keyup','.box-abs-reason .modal-body .form-class input[type=text]',function(){
+	if($(this).val()!=$(this).prop('defaultValue')){
+		$(this).css({'border':"1px solid #F0AD4E","box-shadow":"0px 0px 10px #F0AD4E"});
+		$(this).parent().find('a[data-action-reason=reset]').show();
+		if($(this).parent().find('input').attr('name')=='reason'){
+			$(this).parent().find('input[name=reason]').attr('name','update_reason[]');
+			$(this).parent().find('input[type=hidden]').attr('name','rin_update[]');
+		}
+	}
+	else if($(this).prop('defaultValue')==$(this).val()){
+		$(this).css({"border":"1px solid #ccc","box-shadow":"none"});
+		$(this).parent().find('a[data-action-reason=reset]').hide();
+		if($(this).parent().find('input').attr('name')=='update_reason[]'){
+			$(this).parent().find('input[name="update_reason[]"]').attr('name','reason');
+			$(this).parent().find('input[type=hidden]').attr('name','rin[]');
+		}
+	}
+});
+
+$(document).on('click','.box-comment-for-teacher .modal-body .form-class a[data-action=reset]',function(){
+	$(this).parent().find('input[type=text]').css({"border":"1px solid #ccc","box-shadow":"none"});
+	$(this).parent().find('input[type=text]').val($(this).parent().find('input[type=text]').prop('defaultValue'));
+	$(this).hide();	
+	if($(this).parent().find('input').attr('name')=='update_review[]'){
+		$(this).parent().find('input[name="update_review[]"]').attr('name','review');
+		$(this).parent().find('input[type=hidden]').attr('name','rin[]');
+	}
+});
+
+$(document).on('click','.box-abs-reason .modal-body .form-class a[data-action-reason=reset]',function(){
+	$(this).parent().find('input[type=text]').css({"border":"1px solid #ccc","box-shadow":"none"});
+	$(this).parent().find('input[type=text]').val($(this).parent().find('input[type=text]').prop('defaultValue'));
+	$(this).hide();	
+	if($(this).parent().find('input').attr('name')=='update_reason[]'){
+		$(this).parent().find('input[name="update_reason[]"]').attr('name','reason');
+		$(this).parent().find('input[type=hidden]').attr('name','rin[]');
+	}
+});
+
 $(document).on('click', 'a[data-action=remove-prize-notification]',function(){
 	if($(this).prev().attr('name')==''){
 		$(this).prev().attr('name','spn[]')
@@ -532,17 +715,18 @@ $(document).on('click', 'a[data-action=restore-prize-notification]',function(){
 	}
 });
 
-$(document).on('click', 'a[data-action=remove-attendance-notification]',function(){
+$(document).on('click', 'a[data-action=remove-attendance-notification], a[data-action=remove-quiz-retake-notification]',function(){
+	$item = $(this).data('item');
 	if($(this).prev().attr('name')==''){
-		$(this).prev().attr('name','ann[]')
+		$(this).prev().attr('name',$item+'[]')
 		$(this).next().show();
 		$(this).hide();
 		lightAlert($(this).parents('tr'), '#d9534f', 0.3, 300);
 	}
 });
-$(document).on('click', 'a[data-action=restore-attendance-notification]',function(){
-	console.log($(this).prev().prev().attr('name'));
-	if($(this).prev().prev().attr('name')=='ann[]'){
+$(document).on('click', 'a[data-action=restore-attendance-notification], a[data-action=restore-quiz-retake-notification]',function(){
+	console.log($item);
+	if($(this).prev().prev().attr('name')==$item+'[]'){
 		$(this).prev().show();
 		$(this).prev().prev().attr('name','');
 		$(this).hide();
@@ -668,7 +852,8 @@ $(document).on('change','.edit-modal',function(){
 		$(this).parents('.modal-header').find('.edit-subject').find('input[type=hidden]').val($val);
 		$(this).parents('.modal-header').find('.edit-subject').find('input[type=text]').val($text);
 		// $(this).parents('.modal-header').find('.delete_subject').attr('onsubmit','return confirm("Вы точно хотите удалить предмет \"'+$text+'\"")');
-		$('.topic-list').text("Loading...");
+		// $('.topic-list').text("Loading...");
+		$('.topic-list').html("<center><img src='../img/loading.gif' style='width:100%;'></center>");
 		$('.topic-list').load("edit_modal.php?part=header-part&data_num="+$val);
 		$('.box-data .modal-body').text('Loading...');
 		$('.box-data .modal-body').load("edit_modal.php?part=body-part&subpart=topic&data_num="+$val);
@@ -1258,7 +1443,8 @@ $(document).on('click','.schedules .btn-week',function(){
 	}
 });
 // --------------------------------------------modal-group-schedule-end-------------------------------------
-// --------------------------------------------START_SUGGESTION_MODAL---------------------------------------
+// --------------------------------------------START-SUGGESTION-MODAL---------------------------------------
+<?php if(isset($_SESSION['role']) & $_SESSION['role']==md5('admin')){ ?>
 $(document).on('click','.btn-suggestion',function(){
 	$('.box-suggestion .modal-header .modal-title').html("<center><b>Ұсыныстар</b></center>");
 	$('.box-suggestion .modal-body').html("<h3>Loading...</h3>");
@@ -1293,7 +1479,9 @@ $(document).on('submit','#suggestion-wating-form',function(e){
 	    	// console.log(data);
 	    	if(data.success){
 	    		$('.select-box').stop().css({'background-color':"#5CB85C"}).animate({backgroundColor: 'rgba(255, 255, 255, 0)'},200,function(){
-    				$(".box-suggestion").modal('hide');
+    				// $(".box-suggestion").modal('hide');
+    				$('.box-suggestion .modal-body').html("<h3>Loading...</h3>");
+					$('.box-suggestion .modal-body').load('load_suggestion.php');
     			});
 	    	} 
 	    	else{
@@ -1331,7 +1519,9 @@ $(document).on('click','.btn-suggestion-waiting-reject',function(){
 	    	// console.log(data);
 	    	if(data.success){
 	    		$('#suggestion-wating-form .select-box').stop().css({'background-color':"#d9534f"}).animate({backgroundColor: 'rgba(255, 255, 255, 0)'},500,function(){
-    				$(".box-suggestion").modal('hide');
+    				// $(".box-suggestion").modal('hide');
+    				$('.box-suggestion .modal-body').html("<h3>Loading...</h3>");
+					$('.box-suggestion .modal-body').load('load_suggestion.php');
     			});
 	    	} 
 	    	else{
@@ -1366,7 +1556,9 @@ $(document).on('submit','#suggestion-accepted-form',function(e){
 	    	// console.log(data);
 	    	if(data.success){
 	    		$('#suggestion-accepted-form .select-box').stop().css({'background-color':"#5CB85C"}).animate({backgroundColor: 'rgba(255, 255, 255, 0)'},200,function(){
-    				$(".box-suggestion").modal('hide');
+    				// $(".box-suggestion").modal('hide');
+    				$('.box-suggestion .modal-body').html("<h3>Loading...</h3>");
+					$('.box-suggestion .modal-body').load('load_suggestion.php');
     			});
 	    	} 
 	    	else{
@@ -1404,7 +1596,9 @@ $(document).on('click','.btn-suggestion-accepted-reject',function(){
 	    	// console.log(data);
 	    	if(data.success){
 	    		$('#suggestion-accepted-form .select-box').stop().css({'background-color':"#d9534f"}).animate({backgroundColor: 'rgba(255, 255, 255, 0)'},500,function(){
-    				$(".box-suggestion").modal('hide');
+    				// $(".box-suggestion").modal('hide');
+    				$('.box-suggestion .modal-body').html("<h3>Loading...</h3>");
+					$('.box-suggestion .modal-body').load('load_suggestion.php');
     			});
 	    	} 
 	    	else{
@@ -1421,7 +1615,8 @@ $(document).on('click','.btn-suggestion-accepted-reject',function(){
 $(document).on('click','#implementedSuggestion',function(){
 	$('#implementedSuggestionBox').fadeToggle();
 });
-// --------------------------------------------END_SUGGESTION_MODAL-----------------------------------------
+<?php } ?>
+// --------------------------------------------END-SUGGESTION-MODAL-----------------------------------------
 
 function newsValidation(){
 	console.log('asdf');
@@ -1498,6 +1693,133 @@ $(document).on('click','.open-access',function(){
     	} 	        
    	});
 });
+
+// -------------------------------------------------------------START-BOX-ABS-REASON--------------------------------------------------------------------------------
+$(document).on('click','.abs-reason',function(){
+	$('.box-abs-reason .modal-header .modal-title').html("<center><b>Сабаққа келмеген кездегі себептер.</b></center>");
+	$('.box-abs-reason .modal-body').html("<h3>Loading...</h3>");
+	$('.box-abs-reason .modal-body').load('load_reason.php');
+});
+// -------------------------------------------------------------END-BOX-ABS-REASON---------------------------------------------------------------------------------- 
+
+
+// ------------------------------------------------------------------START-SUGGESTION-INPUT-------------------------------------------------------------------------
+<?php if(isset($_SESSION['role']) && $_SESSION['role']==md5('moderator')){ ?>
+	$(document).on('click','.suggestion',function(){
+		$('.box-suggestion .modal-header .modal-title').html("<center><b>Ұсыныс</b></center>");
+		$(".box-suggestion .modal-body").html("<center><h3>Loading...</h3></center>");
+		$(".box-suggestion .modal-body").load("load_suggestion_input.php");
+	});
+
+	$(document).on('click','#suggestion, #suggestion-cancel',function(){
+		$('#suggestion').toggle();
+		$("#suggestion-form").toggle();
+	});
+
+	$(document).on('submit','#suggestion-form',function(e){
+		$this = $(this);
+		e.preventDefault();
+		$.ajax({
+	    	url: "ajaxDb.php?<?php echo md5(md5('add-new-suggestion'))?>",
+	    	type: "POST",
+			data:  new FormData(this),
+			contentType: false,
+    	    cache: false,
+			processData:false,
+			beforeSend:function(){
+				$('#lll').css('display','block');
+			},
+			success: function(dataS){
+				$('#lll').css('display','none');
+		    	// console.log(dataS);
+		    	data = $.parseJSON(dataS);
+		    	// console.log(data);
+		    	if(data.success){
+		    		$this.stop().css({'background-color':"#5CB85C"}).animate({backgroundColor: 'rgba(255, 255, 255, 0)'},500,function(){
+			    		$(".box-suggestion").modal('hide');		
+		    		});
+		    	} 
+		    	else{
+		    		console.log(data);
+		    	}
+		    },
+		  	error: function(dataS) 
+	    	{
+	    		console.log(dataS);
+	    	} 	        
+	   	});
+	});
+
+	$(document).on('click','.suggestion-edit, .suggestion-edit-cancel',function(){
+		$(this).parents('tr').find('.suggestion-text').toggle();
+		$(this).parents('tr').find('.suggestion-form-edit').toggle();
+	});
+
+	$(document).on('submit','.suggestion-form-edit',function(e){
+		$this = $(this);
+		e.preventDefault(e);
+		$.ajax({
+	    	url: "ajaxDb.php?<?php echo md5(md5('edit-suggestion'))?>",
+	    	type: "POST",
+			data:  new FormData(this),
+			contentType: false,
+    	    cache: false,
+			processData:false,
+			beforeSend:function(){
+				$('#lll').css('display','block');
+			},
+			success: function(dataS){
+				$('#lll').css('display','none');
+		    	// console.log(dataS);
+		    	data = $.parseJSON(dataS);
+		    	// console.log(data);
+		    	if(data.success){
+		    		$this.parents('tr').stop().css({'background-color':"#5CB85C"}).animate({backgroundColor: 'rgba(255, 255, 255, 0)'},500,function(){
+		    			$(".box-suggestion").modal('hide');	
+		    		});
+		    	} 
+		    	else{
+		    		console.log(data);
+		    	}
+		    },
+		  	error: function(dataS) 
+	    	{
+	    		console.log(dataS);
+	    	} 	        
+	   	});
+	});
+	$(document).on('click','.suggestion-delete',function(){
+		$this = $(this);
+		$sid = $this.parents('tr').find('input[name=sid]').val();
+		$.ajax({
+	    	url: "ajaxDb.php?<?php echo md5(md5('remove-suggestion'))?>&sid="+$sid,
+			cache : false,
+			beforeSend:function(){
+				$('#lll').css('display','block');
+			},
+			success: function(dataS){
+				$('#lll').css('display','none');
+		    	// console.log(dataS);
+		    	data = $.parseJSON(dataS);
+		    	// console.log(data);
+		    	if(data.success){
+		    		$this.parents('tr').stop().css({'background-color':"#5CB85C"}).animate({backgroundColor: 'rgba(255, 255, 255, 0)'},500,function(){
+		    			$(this).remove();
+		    		});
+		    	} 
+		    	else{
+		    		console.log(data);
+		    	}
+		    },
+		  	error: function(dataS) 
+	    	{
+	    		console.log(dataS);
+	    	} 	        
+	   	});
+	});
+<?php } ?>
+// ------------------------------------------------------------------END-SUGGESTION-INPUT---------------------------------------------------------------------------
+
 
 </script>
 </body>

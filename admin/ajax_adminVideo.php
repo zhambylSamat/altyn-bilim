@@ -8,11 +8,28 @@
 		header('location:index.php');
 	}
 ?>
+<button id='refresh'>Refresh</button>
+<div id='vimeo-content'>
+	<?php include_once('ajax_vimeo_video.php');?>
+</div>
+
+
+
+
+
+
+
+
+
+
+<hr><hr><hr>
+
+
 <div>
 	<?php
 		$result_count = '';
 		try {
-			$stmt = $conn->prepare("SELECT * FROM video WHERE subtopic_num = :subtopic_num ORDER BY updated_date ASC");
+			$stmt = $conn->prepare("SELECT * FROM video WHERE subtopic_num = :subtopic_num AND vimeo_link = ''  ORDER BY updated_date ASC");
 		    $stmt->bindParam(':subtopic_num', $elementNum, PDO::PARAM_STR);
 
 		    $stmt->execute();

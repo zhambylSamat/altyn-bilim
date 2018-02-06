@@ -21,10 +21,8 @@
             DG.marker([43.25611174779537,76.93221330642702]).addTo(map).bindPopup('Сейфуллина 531, уг. ул. Қазыбек би. БЦ "Сарыарқа", 7 этаж, офис 704/4. Altyn Bilim.');
         });
     </script>
-    <link href="new_year/css/new_year.css" rel="stylesheet">
 </head>
 <body>
-<?php include_once('new_year/new_year.php');?>
 <?php include_once('header.php');?>
 <?php include_once('header-fixed.php');?>
 <div style='background-color: #24A0E6; width: 100%; padding:1% 0px;'>
@@ -588,7 +586,6 @@ $(document).on("click",'.cover, .close2',function(){
 	// $("#float-news").find('#float-news-head').find('img').attr('src','');
 	$('.float-news-global').slideUp();
 });
-</script>
-<script type="text/javascript" src="new_year/js/new_year.js"></script>   
+</script> 
 </body>
 </html>

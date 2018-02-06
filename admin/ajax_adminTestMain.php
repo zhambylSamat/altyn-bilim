@@ -11,6 +11,7 @@
 										st.subtopic_name, 
 										v.video_num, 
 										v.video_link, 
+										v.vimeo_link,
 										ps.problem_solution_id, 
 										ps.document_link, 
 										tst.test_num, 
@@ -37,7 +38,13 @@
 		    foreach ($result as $k => $v) {
 		    	$res[$v['topic_num']]['topic_name'] = $v['topic_name'];
 		    	$res[$v['topic_num']]['subtopic'][$v['subtopic_num']]['subtopic_name'] = $v['subtopic_name'];
-		    	$res[$v['topic_num']]['subtopic'][$v['subtopic_num']]['video'][$v['video_num']] = $v['video_link'];
+		    	if($v['vimeo_link']=='y'){
+		    		$res[$v['topic_num']]['subtopic'][$v['subtopic_num']]['vimeo'][$v['video_num']] = $v['video_link'];
+		    	}
+		    	else {
+		    		$res[$v['topic_num']]['subtopic'][$v['subtopic_num']]['vimeo'][$v['video_num']] = "";
+		    		$res[$v['topic_num']]['subtopic'][$v['subtopic_num']]['video'][$v['video_num']] = $v['video_link'];
+		    	}
 		    	$res[$v['topic_num']]['subtopic'][$v['subtopic_num']]['file'][$v['problem_solution_id']] = $v['document_link'];
 		    	// $res[$v['topic_num']]['subtopic'][$v['subtopic_num']]['test'][$v['test_num']] = $v['last_date'];
 		    	$res[$v['topic_num']]['subtopic'][$v['subtopic_num']]['test'] = $v['last_date'];
@@ -53,11 +60,12 @@
 		foreach ($res as $topic_num => $v) { 
 	?>
 	<tr class='info'>
-		<td colspan='4'><center><?php echo $v['topic_name'];?></center></td>
+		<td colspan='5'><center><?php echo $v['topic_name'];?></center></td>
 	</tr>
 	<tr class='active'>
-		<th><center>#</center></th>
+		<th><center>Тақырып</center></th>
 		<th><center>Видео</center></th>
+		<th><center>Vimeo</center></th>
 		<th><center>Есеп</center></th>
 		<th><center>Тест</center></th>
 	</tr>
@@ -66,11 +74,27 @@
 		$subtopic_count=0; 
 		foreach ($v['subtopic'] as $subtopic_num => $v) { ?>
 	<tr id="<?php echo ++$topic_count;?>_tr">
-		<td><?php echo ++$subtopic_count.". ".$v['subtopic_name']; ?></td>
+		<td><i><?php echo ++$subtopic_count.". ".$v['subtopic_name']; ?></i></td>
 		<td>
 			<?php
 				$video_count = 0;
 				foreach ($v['video'] as $video_num => $val) {
+					if($video_num!='') {
+						$video_count++; 
+						echo "<p style='margin:0;'><b>".$val."</b></p>";
+						$existing[0] = 1;
+					}
+				}
+				if($video_count==0) {
+					echo "<p style='margin:0;' class='text-danger'>Видео енгізілмеген!</p>";
+					$existing[0] = 0;
+				} 
+			?>
+		</td>
+		<td>
+			<?php
+				$video_count = 0;
+				foreach ($v['vimeo'] as $video_num => $val) {
 					if($video_num!='') {
 						$video_count++; 
 						echo "<p style='margin:0;'>".$val."</p>";

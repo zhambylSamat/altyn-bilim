@@ -17,6 +17,7 @@
 								FROM group_info gi
 							    	INNER JOIN group_student gs 
 							        	ON gs.group_info_num = gi.group_info_num
+							        		AND gs.start_date <= CURDATE()
 							        INNER JOIN student s
 							        	ON s.student_num = gs.student_num
 							        		AND s.block != 1

@@ -2,7 +2,7 @@
 	include_once('../connection.php');
 	try {
 		$stmt = $conn->prepare("SELECT * FROM suggestion WHERE user_num = :user_num ORDER BY status ASC");
-		$stmt->bindParam(':user_num', $_SESSION['teacher_num'], PDO::PARAM_STR);
+		$stmt->bindParam(':user_num', $_SESSION['adminNum'], PDO::PARAM_STR);
 		$stmt->execute();
 
 		$result = $stmt->fetchAll();

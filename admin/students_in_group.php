@@ -15,6 +15,7 @@
 									teacher t
 								WHERE gi.subject_num = s.subject_num 
 									AND gs.student_num = :student_num 
+									AND gs.start_date <= CURDATE()
 									AND gs.group_info_num = gi.group_info_num 
 									AND gi.teacher_num = t.teacher_num
 								order by last_update asc");
@@ -25,6 +26,20 @@
 	    $stmt = $conn->prepare("SELECT count(description) c FROM review_info where description = 'review' group by description");
 	    $stmt->execute();
 	    $total_comment_number = $stmt->fetch(PDO::FETCH_ASSOC);
+
+	    $stmt = $conn->prepare("SELECT gi.group_info_num, 
+	    							gi.group_name, 
+	    							DATE_FORMAT(gs.start_date, '%d.%m.%y') as start_date
+	    						FROM group_info gi,
+	    							group_student gs
+	    						WHERE gs.student_num = :student_num
+	    							AND gs.start_date > CURDATE() 
+	    							AND gi.group_info_num = gs.group_info_num
+	    						ORDER BY gs.start_date ASC");
+	    $stmt->bindParam(':student_num', $_GET['data_num'], PDO::PARAM_STR);
+	    $stmt->execute();
+	    $result_queue_student = $stmt->fetchAll(); 
+
 	} catch (PDOException $e) {
 		echo "Error: " . $e->getMessage();
 	}
@@ -43,7 +58,7 @@
 <li>
 	<?php if($alert=='show' && $value['subject_num']!='S5985a7ea3d0ae721486338'){ ?><span class='glyphicon glyphicon-remove' style='color: red;?>'></span><?php } ?>
 	<a href="group.php?data_num=<?php echo $value['group_info_num'];?>" target='_blank'>
-		<span style='margin-left:5%'>Группа: <b><?php echo $value["group_name"];?></b></span>
+		<span style='margin-left:2%'>Группа: <b><?php echo $value["group_name"];?></b></span>
 		<span style='margin-left:5%;'>Пән: <b><?php echo $value['subject_name'];?></b></span>
 		<span style='margin-left:5%;'>Мұғалім: <b><?php echo $value['surname']." ".$value['name'];?></b></span>
 		<span style='margin-left:5%;'>Түсініктеме: <b><?php echo $value['comment'];?></b></span>
@@ -56,4 +71,16 @@
 	}
 ?>
 </ol>
+<?php 
+	if(!empty($result_queue_student)){
+		echo "<hr><span></span><ol type='1'>";
+		foreach ($result_queue_student as $value) {
+?>
+	<li>
+		<a href="group.php?data_num=<?php echo $value['group_info_num'];?>" target='_blank'>
+			<span style='margin-left:2%;'><?php echo $value['group_name'];?></span>
+			<span style='margin-left:5%;'>Курстың басталатын уақыты: <b><?php echo $value['start_date'];?></b></span>
+		</a>
+	</li>
+<?php } echo "</ol>"; } ?>
 </td>

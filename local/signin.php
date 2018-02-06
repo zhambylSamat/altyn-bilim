@@ -1,6 +1,6 @@
 <?php
 	include_once('../connection.php');
-	if(isset($_SESSION['student_num'])){
+	if(isset($_SESSION['student_num']) && isset($_SESSION['access']) && $_SESSION['access']==md5('true')){
 		header('location:index.php');
 	}
 ?>

@@ -21,7 +21,7 @@ else{
 <?php 
 	try {
 		if($result_permission['vPermission']=='t'){
-			$stmt_video = $conn->prepare("SELECT * FROM video WHERE subtopic_num = :subtopic_num");
+			$stmt_video = $conn->prepare("SELECT video_link, vimeo_link FROM video WHERE subtopic_num = :subtopic_num AND vimeo_link != 'n'");
 
 			$stmt_video->bindParam(':subtopic_num', $_GET[md5(md5('dataNum'))], PDO::PARAM_STR);
 	     	
@@ -35,8 +35,17 @@ else{
 ?>
 <?php if($count_video==0){?>
 <center><h4 class='text-danger'>Видео не добавлено!</h4></center>
+<!-- Видеосабақ жіберілмеген, мұғалімнен видеосабақ жіберуін сұраңыз! -->
 <?php } ?>
-<?php foreach($result_video as $readrow_video){?>
+<div id='video'>
+<?php foreach($result_video as $readrow_video){
+	if($readrow_video['vimeo_link']=='y'){
+?>
+	<script>
+		console.log("<?php echo $readrow_video['vimeo_link'];?>");
+		load_vimeo_video("<?php echo $readrow_video['video_link'];?>");
+	</script>
+<?php }else { ?>
 <center>
 	<video id="my-video" class="video-js" controls preload="auto" width="640" height="264" data-setup="{}">
 	    <source src="../video/video_lesson/<?php echo $readrow_video['video_link']?>" type='video/mp4'>
@@ -46,6 +55,8 @@ else{
 </center>
 <hr>
 <?php } ?>
+<?php } ?>
+</div>
 <?php
 	if($result_permission['tPermission']=='t' && $result_permission['done']=='n'){
 ?>
@@ -59,7 +70,7 @@ else{
 $(document).ready(function(){
 	$('script[src="http://vjs.zencdn.net/ie8/1.1.2/videojs-ie8.min.js"]').remove();
     $('<script>').attr('src', 'http://vjs.zencdn.net/ie8/1.1.2/videojs-ie8.min.js').appendTo('body');
-    $('script[src="http://vjs.zencdn.net/6.1.0/video.js"]').remove();
-    $('<script>').attr('src', 'http://vjs.zencdn.net/6.1.0/video.js').appendTo('body');
+    $('script[src="https://vjs.zencdn.net/6.1.0/video.js"]').remove();
+    $('<script>').attr('src', 'https://vjs.zencdn.net/6.1.0/video.js').appendTo('body');
 });
 </script>

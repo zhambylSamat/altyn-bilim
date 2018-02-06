@@ -19,7 +19,6 @@
 				$data_subject[$value['topic_num']]['subtopic'][$value['subtopic_num']]['name'] = $value['subtopic_name'];
 			}
 
-			// $stmt = $conn->prepare("SELECT stp.video_permission video_permission, stp.test_permission test_permission, stp.subtopic_num subtopic_num FROM student_permission sp, student_test_permission stp, subtopic st, topic t WHERE stp.subtopic_num = st.subtopic_num AND t.topic_num = st.topic_num AND t.subject_num = :subject_num AND sp.student_num = :student_num AND sp.student_permission_num = stp.student_permission_num");
 			$stmt = $conn->prepare("SELECT v.video_num video_num, stp.video_permission video_permission, stp.test_permission test_permission, stp.subtopic_num subtopic_num FROM student_permission sp, student_test_permission stp, video v WHERE v.subtopic_num = stp.subtopic_num AND sp.student_num = :student_num AND sp.student_permission_num = stp.student_permission_num AND stp.subtopic_num in (SELECT st.subtopic_num FROM subtopic st, topic t WHERE st.topic_num = t.topic_num AND t.subject_num = :subject_num)");
 			$stmt->bindParam(':subject_num', $_GET['extra_num'], PDO::PARAM_STR);
 			$stmt->bindParam(':student_num', $_GET['data_num'], PDO::PARAM_STR);
@@ -50,7 +49,7 @@
 				<p class='subtopic'><a><?php echo $sValue['name'];?></a></p>
 				<div style='display: none;'>
 					<?php
-						if(intval(date("h"))>=2 && intval(date("h"))<9 && date('a')=='pm'){
+						if((new DateTime("15:00:00"))->diff(new DateTime)->format('%R') == '+' && (new DateTime("20:10:00"))->diff(new DateTime)->format('%R') == '-' && date('a')=='pm'){
 					?>
 					<form class='form-inline' id='set_permission' method='post'>
 						<div class='form-group'>

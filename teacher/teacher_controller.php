@@ -127,7 +127,7 @@ if(isset($_POST['submit_permission'])){
 	    $stmt->bindParam(':student_permission_num', $student_permission_num, PDO::PARAM_STR);
 	    $stmt->bindParam(':student_num', $student_num, PDO::PARAM_STR);
 
-	    $student_permission_num = uniqid('S_P', true);
+	    $student_permission_num = uniqid('S_P', true)."_".time();
 	    $student_num = $_POST['data_num'];
 
 	    $stmt->execute();
@@ -170,40 +170,41 @@ if(isset($_POST['submit_permission'])){
 if(isset($_POST['add_mark'])){
 	try {
 		$attendance_notification = array();
-		$progress_group_num = uniqid('PG', true);
+		$progress_group_num = uniqid('PG', true)."_".time();
 		$group_info_num = $_POST['data_num'];
 		$created_date = date("Y-".$_POST['month']."-".$_POST['day']);
 		$stmt = $conn->prepare("INSERT INTO progress_group (progress_group_num, group_info_num, created_date) VALUES(:progress_group_num, :group_info_num, :created_date)");
     	$stmt->bindParam(':progress_group_num', $progress_group_num, PDO::PARAM_STR);
     	$stmt->bindParam(':group_info_num', $group_info_num, PDO::PARAM_STR);
     	$stmt->bindParam(':created_date', $created_date, PDO::PARAM_STR);
-	    $stmt->execute();
+	    if($stmt->execute()){
 
-	    $col_num = $_POST['last_col_num'];
-	    $students = $_POST['datas'];
-	    $group_student_num = $_POST['grstdnum'];
-	    $attendance = $_POST['attendance'][intval($col_num)];
-	    $home_work = $_POST['home_work_mark'][intval($col_num)];
-	    $query = "INSERT INTO progress_student (progress_student_num, progress_group_num, student_num, attendance, home_work) VALUES";
-	    $qPart = array_fill(0, count($students), "(?, ?, ?, ?, ?)");
-	    $query .= implode(",",$qPart);
-	    $stmtA = $conn->prepare($query);
-	    $j = 1;
-	    for($i = 0; $i<count($students); $i++){
-	    	$progress_student_num = uniqid('PS', true);
-	    	array_push($attendance_notification, array("group_student_num"=>$group_student_num[$i], "progress_student_num"=>$progress_student_num, "att"=>$attendance[$i]));
-	    	$stmtA->bindValue($j++, $progress_student_num, PDO::PARAM_STR);
-	    	$stmtA->bindValue($j++, $progress_group_num, PDO::PARAM_STR);
-	    	$stmtA->bindValue($j++, $students[$i], PDO::PARAM_STR);
-	    	$stmtA->bindValue($j++, $attendance[$i], PDO::PARAM_STR);
-	    	$stmtA->bindValue($j++, $home_work[$i], PDO::PARAM_STR);
-	    }
-	    $stmtA->execute();
-    	foreach ($attendance_notification as $key => $value) {
-    		set_attendance_abs($value['group_student_num'], $value['progress_student_num'], $value['att'], 'add');
-    	}
+		    $col_num = $_POST['last_col_num'];
+		    $students = $_POST['datas'];
+		    $group_student_num = $_POST['grstdnum'];
+		    $attendance = $_POST['attendance'][intval($col_num)];
+		    $home_work = $_POST['home_work_mark'][intval($col_num)];
+		    $query = "INSERT INTO progress_student (progress_student_num, progress_group_num, student_num, attendance, home_work) VALUES";
+		    $qPart = array_fill(0, count($students), "(?, ?, ?, ?, ?)");
+		    $query .= implode(",",$qPart);
+		    $stmtA = $conn->prepare($query);
+		    $j = 1;
+		    for($i = 0; $i<count($students); $i++){
+		    	$progress_student_num = uniqid('PS', true)."_".time();
+		    	array_push($attendance_notification, array("group_student_num"=>$group_student_num[$i], "progress_student_num"=>$progress_student_num, "att"=>$attendance[$i]));
+		    	$stmtA->bindValue($j++, $progress_student_num, PDO::PARAM_STR);
+		    	$stmtA->bindValue($j++, $progress_group_num, PDO::PARAM_STR);
+		    	$stmtA->bindValue($j++, $students[$i], PDO::PARAM_STR);
+		    	$stmtA->bindValue($j++, $attendance[$i], PDO::PARAM_STR);
+		    	$stmtA->bindValue($j++, $home_work[$i], PDO::PARAM_STR);
+		    }
+		    $stmtA->execute();
+	    	foreach ($attendance_notification as $key => $value) {
+	    		set_attendance_abs($value['group_student_num'], $value['progress_student_num'], $value['att'], 'add');
+	    	}
 
-	    header('location:group.php?data_num='.$group_info_num);
+		    header('location:group.php?data_num='.$group_info_num);
+		}
 	} catch (PDOException $e) {
 		echo "Error: " . $e->getMessage();
 	}
@@ -241,7 +242,7 @@ if(isset($_POST['edit_mark'])){
 		    $stmtA = $conn->prepare($query);
 		    $j = 1;
 		    for($i = 0; $i<count($new_student); $i++){
-		    	$progress_student_num = uniqid('PS', true);
+		    	$progress_student_num = uniqid('PS', true)."_".time();
 		    	array_push($attendance_notification, array("group_student_num"=>$new_group_student_num[$i], "progress_student_num"=>$progress_student_num, "att"=>$new_attendance[$i]));
 		    	$hW = ($new_home_work_mark[$i]==null) ? 0 : $new_home_work_mark[$i];
 		    	$stmtA->bindValue($j++, $progress_student_num, PDO::PARAM_STR);
@@ -273,14 +274,34 @@ if(isset($_POST['submit_marks'])){
 		$quiz_num = '';
 		if($quiz_status == 'new'){
 			$stmt = $conn->prepare("INSERT INTO quiz (quiz_num, topic_num) VALUES(:quiz_num, :topic_num)");
-			$quiz_num = uniqid("Q",true);
+			$quiz_num = uniqid("Q",true)."_".time();
 			$stmt->bindParam(':quiz_num', $quiz_num, PDO::PARAM_STR);
 			$stmt->bindParam(':topic_num', $topic_num, PDO::PARAM_STR);
 			$stmt->execute();
 		}
 		if($quiz_mark_status == 'new'){
-			$stmt = $conn->prepare("INSERT INTO quiz_mark (quiz_mark_num, quiz_num, student_num, mark_theory, mark_practice) VALUES(:quiz_mark_num, :quiz_num, :student_num, :mark_theory, :mark_practice)");
-			$quiz_mark_num = uniqid("QM", true);
+			$quiz_mark_num = uniqid("QM", true)."_".time();
+			if($_POST['retake'] == md5('y') && (($mark_theory < 70 && $mark_theory != 0) || $mark_practice < 70)){
+				$stmt = $conn->prepare("SELECT qm.quiz_mark_num
+										FROM quiz q,
+										    quiz_mark qm
+										WHERE q.topic_num = :topic_num
+											AND qm.quiz_num = q.quiz_num
+										    AND qm.student_num = :student_num");
+				$stmt->bindParam(':topic_num', $topic_num, PDO::PARAM_STR);
+				$stmt->bindParam(':student_num', $student_num, PDO::PARAM_STR);
+				$stmt->execute();
+				$result_retakes = $stmt->fetchAll();
+				$stmt = $conn->prepare("INSERT INTO quiz_retake_notification (student_num, retake_1, retake_2) VALUES(:student_num, :retake_1, :retake_2)");
+				$stmt->bindParam(':student_num', $student_num, PDO::PARAM_STR);
+				$stmt->bindParam(':retake_1', $result_retakes[0]['quiz_mark_num'], PDO::PARAM_STR);
+				$stmt->bindParam(':retake_2', $quiz_mark_num, PDO::PARAM_STR);
+				$stmt->execute();
+
+			}
+
+			$stmt = $conn->prepare("INSERT INTO quiz_mark (quiz_mark_num, quiz_num, student_num, mark_theory, mark_practice, created_date) VALUES(:quiz_mark_num, :quiz_num, :student_num, :mark_theory, :mark_practice, :created_date)");
+			$created_date = date("Y-m-d H:i:s");
 			$done = 1;
 			$quiz_num = ($quiz_num=='') ? $_POST['quiz_status'] : $quiz_num;
 			$stmt->bindParam(':quiz_mark_num', $quiz_mark_num, PDO::PARAM_STR);
@@ -288,15 +309,21 @@ if(isset($_POST['submit_marks'])){
 			$stmt->bindParam(':student_num', $student_num, PDO::PARAM_STR);
 			$stmt->bindParam(':mark_theory', $mark_theory, PDO::PARAM_INT);
 			$stmt->bindParam(':mark_practice', $mark_practice, PDO::PARAM_INT);
+			$stmt->bindParam(':created_date', $created_date, PDO::PARAM_STR);
 			$stmt->execute();
 		}
 		else if($quiz_mark_status != 'new' && $mark_theory==0 && $mark_practice==0){
 			$stmt = $conn->prepare("DELETE FROM quiz_mark WHERE quiz_mark_num = :quiz_mark_num");
 			$stmt->bindParam(':quiz_mark_num', $quiz_mark_status, PDO::PARAM_STR);
 			$stmt->execute();
+			if($_POST['retake'] == md5('y')){
+				$stmt = $conn->prepare("DELETE FROM quiz_retake_notification WHERE retake_2 = :quiz_mark_num");
+				$stmt->bindParam(':quiz_mark_num', $quiz_mark_status, PDO::PARAM_STR);
+				$stmt->execute();
+			}
 		}
 		else if($quiz_mark_status != 'new'){
-			$created_date = date("Y-m-d h:i:s");
+			$created_date = date("Y-m-d H:i:s");
 			// if() $created_date = "2030-12-31 23:59:59";
 			$stmt = $conn->prepare("UPDATE quiz_mark SET mark_theory = :mark_theory, mark_practice = :mark_practice, created_date = :created_date WHERE quiz_mark_num = :quiz_mark_num");
 			$quiz_mark_num = $quiz_mark_status;
@@ -306,6 +333,37 @@ if(isset($_POST['submit_marks'])){
 			$stmt->bindParam(':quiz_mark_num', $quiz_mark_num, PDO::PARAM_STR);
 			$stmt->bindParam(':created_date', $created_date, PDO::PARAM_STR);
 			$stmt->execute();
+
+			if($_POST['retake'] == md5('y')){
+				if(($mark_theory < 70 && $mark_theory != 0) || $mark_practice < 70){
+					$stmt = $conn->prepare("SELECT count(*) as count FROM quiz_retake_notification WHERE retake_2 = :quiz_mark_num");
+					$stmt->bindParam(':quiz_mark_num', $quiz_mark_num, PDO::PARAM_STR);
+					$stmt->execute();
+					$cc = $stmt->fetchAll();
+					if($cc[0]['count']==0){
+						$stmt = $conn->prepare("SELECT qm.quiz_mark_num
+												FROM quiz q,
+												    quiz_mark qm
+												WHERE q.topic_num = :topic_num
+													AND qm.quiz_num = q.quiz_num
+												    AND qm.student_num = :student_num");
+						$stmt->bindParam(':topic_num', $topic_num, PDO::PARAM_STR);
+						$stmt->bindParam(':student_num', $student_num, PDO::PARAM_STR);
+						$stmt->execute();
+						$result_retakes = $stmt->fetchAll();
+						$stmt = $conn->prepare("INSERT INTO quiz_retake_notification (student_num, retake_1, retake_2) VALUES(:student_num, :retake_1, :retake_2)");
+						$stmt->bindParam(':student_num', $student_num, PDO::PARAM_STR);
+						$stmt->bindParam(':retake_1', $result_retakes[0]['quiz_mark_num'], PDO::PARAM_STR);
+						$stmt->bindParam(':retake_2', $quiz_mark_num, PDO::PARAM_STR);
+						$stmt->execute();
+					}
+				}
+				else{
+					$stmt = $conn->prepare("DELETE FROM quiz_retake_notification WHERE retake_2 = :quiz_mark_num");
+					$stmt->bindParam(':quiz_mark_num', $quiz_mark_status, PDO::PARAM_STR);
+					$stmt->execute();
+				}
+			}
 		}
 		if($_POST['retake']==md5('n') && ($mark_theory == 100 || $mark_theory==0) && $mark_practice>=95){
 			$stmt = $conn->prepare("INSERT IGNORE INTO student_prize_notification VALUES(null, :group_student_num, :quiz_mark_num)");
@@ -362,82 +420,203 @@ if(isset($_POST['remove_trial_test_mark'])){
 // -----------------------------------------------------------function_start------------------------------------------------
 function set_attendance_abs($group_student_num, $progress_student_num, $att, $action){
 	global $conn;
+
+	$stmt = $conn->prepare("SELECT action FROM attendance_notification WHERE group_student_num = :group_student_num");
+	$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+	$stmt->execute();
+	$res = $stmt->fetch(PDO::FETCH_ASSOC);
+	$count = $stmt->rowCount();
+
 	if($action == 'add'){
-		$stmt = $conn->prepare("SELECT action FROM attendance_notification WHERE group_student_num = :group_student_num");
-		$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
-		$stmt->execute();
-		$res = $stmt->fetch(PDO::FETCH_ASSOC);
-		$count = $stmt->rowCount();
-		if($count==0 && $att==0){
-			$stmt = $conn->prepare("INSERT INTO attendance_notification (group_student_num, first_abs, action) VALUES(:group_student_num, :first_abs, 0)");
-			$stmt->bindParam(':first_abs', $progress_student_num, PDO::PARAM_STR);
-			$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
-			$stmt->execute();
+
+		if($count == 0){
+			if($att==0){
+				$stmt = $conn->prepare("INSERT INTO attendance_notification (group_student_num, first_abs, action) VALUES(:group_student_num, :first_abs, 1)");
+				$stmt->bindParam(':first_abs', $progress_student_num, PDO::PARAM_STR);
+				$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+				$stmt->execute();
+			}
 		}
 		else if($count==1){
-			if($att==1 && $res['action']==0){
-				$stmt = $conn->prepare("UPDATE attendance_notification SET second_abs = :second_abs, action = 0.5 WHERE group_student_num = :group_student_num");
-				$stmt->bindParam(':second_abs', $progress_student_num, PDO::PARAM_STR);
-				$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
-				$stmt->execute();
+			if($res['action']==1){
+				if($att==0){
+					$stmt = $conn->prepare("UPDATE attendance_notification SET second_abs = :second_abs, action = 2 WHERE group_student_num = :group_student_num");
+					$stmt->bindParam(':second_abs', $progress_student_num, PDO::PARAM_STR);
+					$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+					$stmt->execute();
+				}
+				if($att==1){
+					$stmt = $conn->prepare("UPDATE attendance_notification SET second_abs = :second_abs, action = 1.5 WHERE group_student_num = :group_student_num");
+					$stmt->bindParam(':second_abs', $progress_student_num, PDO::PARAM_STR);
+					$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+					$stmt->execute();
+				}
 			}
-			else if($att==0 && $res['action']== 0){
-				$stmt = $conn->prepare("UPDATE attendance_notification SET second_abs = :second_abs, action = 1 WHERE group_student_num = :group_student_num");
-				$stmt->bindParam(':second_abs', $progress_student_num, PDO::PARAM_STR);
-				$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
-				$stmt->execute();
+			else if($res['action']==1.5){
+				if($att==0){
+					$stmt = $conn->prepare("UPDATE attendance_notification SET first_abs = :first_abs, second_abs = '', action = 1 WHERE group_student_num = :group_student_num");
+					$stmt->bindParam(':first_abs', $progress_student_num, PDO::PARAM_STR);
+					$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+					$stmt->execute();
+				}
+				if($att==1){
+					$stmt = $conn->prepare("DELETE FROM attendance_notification WHERE group_student_num = :group_student_num");
+					$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+					$stmt->execute();
+				}
 			}
-			else if($res['action']==0.5 && $att==1){
+			else if($res['action']==2){
+				if($att==0){
+					$stmt = $conn->prepare("UPDATE attendance_notification SET third_abs = :third_abs, action = 3 WHERE group_student_num = :group_student_num");
+					$stmt->bindParam(':third_abs', $progress_student_num, PDO::PARAM_STR);
+					$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+					$stmt->execute();
+				}
+				if($att==1){
+					$stmt = $conn->prepare("UPDATE attendance_notification SET third_abs = :third_abs, action = 2.5 WHERE group_student_num = :group_student_num");
+					$stmt->bindParam(':third_abs', $progress_student_num, PDO::PARAM_STR);
+					$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+					$stmt->execute();
+				}
+			}
+			else if($res['action']==2.5){
+				if($att==0){
+					$stmt = $conn->prepare("UPDATE attendance_notification SET first_abs = :first_abs, second_abs = '', third_abs = '', action = 1 WHERE group_student_num = :group_student_num");
+					$stmt->bindParam(':first_abs', $progress_student_num, PDO::PARAM_STR);
+					$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+					$stmt->execute();
+				}
+				if($att==1){
+					$stmt = $conn->prepare("DELETE FROM attendance_notification WHERE group_student_num = :group_student_num");
+					$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+					$stmt->execute();
+				}
+			}
+		}
+
+	}
+
+	else if($action == 'edit'){
+
+		if($count==1){
+			if($res['action']==1 && $att==1){
 				$stmt = $conn->prepare("DELETE FROM attendance_notification WHERE group_student_num = :group_student_num");
 				$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
 				$stmt->execute();
 			}
-			else if($res['action']==0.5 && $att==0){
-				$stmt = $conn->prepare("UPDATE attendance_notification SET first_abs = :first_abs, action = :action, second_abs = :second_abs WHERE group_student_num = :group_student_num");
-				$second_abs = null;
-				$action = 0;
-				$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
-				$stmt->bindParam(':first_abs', $progress_student_num, PDO::PARAM_STR);
-				$stmt->bindParam(':action', $action, PDO::PARAM_STR);
-				$stmt->bindParam(':second_abs', $second_abs, PDO::PARAM_STR);
-				$stmt->execute();
-			}
-		}
-	}
-	else if($action == 'edit'){
-		$stmt = $conn->prepare("SELECT second_abs, action FROM attendance_notification WHERE group_student_num = :group_student_num");
-		$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
-		$stmt->execute();
-		$res = $stmt->fetch(PDO::FETCH_ASSOC);
-		$count = $stmt->rowCount();
-		if($count==0 && $att==0){
-			$stmt = $conn->prepare("INSERT INTO attendance_notification (group_student_num, first_abs, action) VALUES(:group_student_num, :first_abs, 0)");
-			$stmt->bindParam(':first_abs', $progress_student_num, PDO::PARAM_STR);
-			$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
-			$stmt->execute();
-		}
-		else if($count==1){
-			if($res['action']==0 && $att==1){
-				$stmt = $conn->prepare("DELETE FROM attendance_notification WHERE group_student_num = :group_student_num ");
-				$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
-				$stmt->execute();
-			}
-			else if($res['action']==0.5 && $att==0){
-				$stmt = $conn->prepare("UPDATE attendance_notification SET second_abs = :second_abs, action = :action WHERE group_student_num = :group_student_num");
-				$action = 1;
-				$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+			else if($res['action']==1.5 && $att==0){
+				$stmt = $conn->prepare("UPDATE attendance_notification SET second_abs = :second_abs, action = 2 WHERE group_student_num = :group_student_num");
 				$stmt->bindParam(':second_abs', $progress_student_num, PDO::PARAM_STR);
-				$stmt->bindParam(':action', $action, PDO::PARAM_STR);
-				$stmt->execute();
-			}
-			else if($res['action']==1 && $att==1){
-				$stmt = $conn->prepare("UPDATE attendance_notification SET action = 0.5 WHERE group_student_num = :group_student_num");
 				$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
 				$stmt->execute();
-				// $stmt->bindParam(':action', 0.5, PDO::PARAM_STR);
+			}
+			else if($res['action']==2 && $att==1){
+				$stmt = $conn->prepare("UPDATE attendance_notification SET second_abs = :second_abs, action = 1.5 WHERE group_student_num = :group_student_num");
+				$stmt->bindParam(':second_abs', $progress_student_num, PDO::PARAM_STR);
+				$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+				$stmt->execute();	
+			}
+			else if($res['action']==2.5 && $att==0){
+				$stmt = $conn->prepare("UPDATE attendance_notification SET third_abs = :third_abs, action = 3 WHERE group_student_num = :group_student_num");
+				$stmt->bindParam(':third_abs', $progress_student_num, PDO::PARAM_STR);
+				$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+				$stmt->execute();	
+			}
+			else if($res['action']==3 && $att==1){
+				$stmt = $conn->prepare("UPDATE attendance_notification SET third_abs = :third_abs, action = 2.5 WHERE group_student_num = :group_student_num");
+				$stmt->bindParam(':third_abs', $progress_student_num, PDO::PARAM_STR);
+				$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+				$stmt->execute();	
 			}
 		}
+		else if($count == 0){
+			if($att==0){
+				$stmt = $conn->prepare("INSERT INTO attendance_notification (group_student_num, first_abs, action) VALUES(:group_student_num, :first_abs, 1)");
+				$stmt->bindParam(':first_abs', $progress_student_num, PDO::PARAM_STR);
+				$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+				$stmt->execute();
+			}
+		}
+
 	}
+
+
+	// if($action == 'add'){
+	// 	$stmt = $conn->prepare("SELECT action FROM attendance_notification WHERE group_student_num = :group_student_num");
+	// 	$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+	// 	$stmt->execute();
+	// 	$res = $stmt->fetch(PDO::FETCH_ASSOC);
+	// 	$count = $stmt->rowCount();
+	// 	if($count==0 && $att==0){
+	// 		$stmt = $conn->prepare("INSERT INTO attendance_notification (group_student_num, first_abs, action) VALUES(:group_student_num, :first_abs, 0)");
+	// 		$stmt->bindParam(':first_abs', $progress_student_num, PDO::PARAM_STR);
+	// 		$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+	// 		$stmt->execute();
+	// 	}
+	// 	else if($count==1){
+	// 		if($att==1 && $res['action']==0){
+	// 			$stmt = $conn->prepare("UPDATE attendance_notification SET second_abs = :second_abs, action = 0.5 WHERE group_student_num = :group_student_num");
+	// 			$stmt->bindParam(':second_abs', $progress_student_num, PDO::PARAM_STR);
+	// 			$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+	// 			$stmt->execute();
+	// 		}
+	// 		else if($att==0 && $res['action']== 0){
+	// 			$stmt = $conn->prepare("UPDATE attendance_notification SET second_abs = :second_abs, action = 1 WHERE group_student_num = :group_student_num");
+	// 			$stmt->bindParam(':second_abs', $progress_student_num, PDO::PARAM_STR);
+	// 			$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+	// 			$stmt->execute();
+	// 		}
+	// 		else if($res['action']==0.5 && $att==1){
+	// 			$stmt = $conn->prepare("DELETE FROM attendance_notification WHERE group_student_num = :group_student_num");
+	// 			$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+	// 			$stmt->execute();
+	// 		}
+	// 		else if($res['action']==0.5 && $att==0){
+	// 			$stmt = $conn->prepare("UPDATE attendance_notification SET first_abs = :first_abs, action = :action, second_abs = :second_abs WHERE group_student_num = :group_student_num");
+	// 			$second_abs = null;
+	// 			$action = 0;
+	// 			$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+	// 			$stmt->bindParam(':first_abs', $progress_student_num, PDO::PARAM_STR);
+	// 			$stmt->bindParam(':action', $action, PDO::PARAM_STR);
+	// 			$stmt->bindParam(':second_abs', $second_abs, PDO::PARAM_STR);
+	// 			$stmt->execute();
+	// 		}
+	// 	}
+	// }
+	// else if($action == 'edit'){
+	// 	$stmt = $conn->prepare("SELECT second_abs, action FROM attendance_notification WHERE group_student_num = :group_student_num");
+	// 	$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+	// 	$stmt->execute();
+	// 	$res = $stmt->fetch(PDO::FETCH_ASSOC);
+	// 	$count = $stmt->rowCount();
+	// 	if($count==0 && $att==0){
+	// 		$stmt = $conn->prepare("INSERT INTO attendance_notification (group_student_num, first_abs, action) VALUES(:group_student_num, :first_abs, 0)");
+	// 		$stmt->bindParam(':first_abs', $progress_student_num, PDO::PARAM_STR);
+	// 		$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+	// 		$stmt->execute();
+	// 	}
+	// 	else if($count==1){
+	// 		if($res['action']==0 && $att==1){
+	// 			$stmt = $conn->prepare("DELETE FROM attendance_notification WHERE group_student_num = :group_student_num ");
+	// 			$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+	// 			$stmt->execute();
+	// 		}
+	// 		else if($res['action']==0.5 && $att==0){
+	// 			$stmt = $conn->prepare("UPDATE attendance_notification SET second_abs = :second_abs, action = :action WHERE group_student_num = :group_student_num");
+	// 			$action = 1;
+	// 			$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+	// 			$stmt->bindParam(':second_abs', $progress_student_num, PDO::PARAM_STR);
+	// 			$stmt->bindParam(':action', $action, PDO::PARAM_STR);
+	// 			$stmt->execute();
+	// 		}
+	// 		else if($res['action']==1 && $att==1){
+	// 			$stmt = $conn->prepare("UPDATE attendance_notification SET action = 0.5 WHERE group_student_num = :group_student_num");
+	// 			$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+	// 			$stmt->execute();
+	// 			// $stmt->bindParam(':action', 0.5, PDO::PARAM_STR);
+	// 		}
+	// 	}
+	// }
 }
 // -----------------------------------------------------------function_end--------------------------------------------------
 
@@ -459,7 +638,7 @@ if(isset($_POST['submit_quiz_marks'])){
 		$max_mark = $_POST['max_mark'];
 		$data_num = $_POST['data_num'];
 		$submit_date = $_POST['quiz_date'];
-		$quiz_num = uniqid("Q",true);
+		$quiz_num = uniqid("Q",true)."_".time();
 
 		$stmt=$conn->prepare("INSERT INTO quiz (quiz_num, group_info_num, max_mark, created_date) VALUES(:quiz_num, :group_info_num, :max_mark, :created_date)");
     	$stmt->bindParam(':quiz_num', $quiz_num, PDO::PARAM_STR);
@@ -475,7 +654,7 @@ if(isset($_POST['submit_quiz_marks'])){
 	    $stmtA = $conn->prepare($query);
 	    $j = 1;
 	    for($i = 0; $i<count($topic); $i++){
-	    	$quiz_tail_num = uniqid('QT', true);
+	    	$quiz_tail_num = uniqid('QT', true)."_".time();
 	    	$stmtA->bindValue($j++, $quiz_tail_num, PDO::PARAM_STR);
 	    	$stmtA->bindValue($j++, $quiz_num, PDO::PARAM_STR);
 	    	$stmtA->bindValue($j++, $topic[$i], PDO::PARAM_STR);
@@ -490,7 +669,7 @@ if(isset($_POST['submit_quiz_marks'])){
 	    $stmtA = $conn->prepare($query);
 	    $j = 1;
 	    for($i = 0; $i<count($student_num); $i++){
-	    	$quiz_mark_num = uniqid('QM', true);
+	    	$quiz_mark_num = uniqid('QM', true)."_".time();
 	    	$stmtA->bindValue($j++, $quiz_mark_num, PDO::PARAM_STR);
 	    	$stmtA->bindValue($j++, $quiz_num, PDO::PARAM_STR);
 	    	$stmtA->bindValue($j++, $student_num[$i], PDO::PARAM_STR);
@@ -528,7 +707,7 @@ if(isset($_POST['edit_quiz_marks'])){
 	    $stmtA = $conn->prepare($query);
 	    $j = 1;
 	    for($i = 0; $i<count($topic); $i++){
-	    	$quiz_tail_num = uniqid('QT', true);
+	    	$quiz_tail_num = uniqid('QT', true)."_".time();
 	    	$stmtA->bindValue($j++, $quiz_tail_num, PDO::PARAM_STR);
 	    	$stmtA->bindValue($j++, $quiz_num, PDO::PARAM_STR);
 	    	$stmtA->bindValue($j++, $topic[$i], PDO::PARAM_STR);

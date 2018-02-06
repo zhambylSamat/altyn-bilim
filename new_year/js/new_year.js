@@ -1,6 +1,6 @@
 $(document).ready(function(){
   $host = "http://"+document.location.hostname+"/altynbilim";
-  $html = "<img class='new-year-icons' id='santa' src='"+$host+"/new_year/img/santa4.png'><img class='new-year-icons' id='tree' src='"+$host+"/new_year/img/tree6.png'>"
+  $html = "<img class='new-year-icons hidden-xs' id='santa' src='"+$host+"/new_year/img/santa4.png'><img class='new-year-icons hidden-xs' id='tree' src='"+$host+"/new_year/img/tree6.png'>"
   $("body").append($html);
 });
 

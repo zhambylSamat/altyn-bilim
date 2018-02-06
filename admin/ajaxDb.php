@@ -62,7 +62,7 @@ if(isset($_GET[md5(md5('createStudent'))])){
 	    $stmt->bindParam(':username', $username, PDO::PARAM_STR);
 	    $stmt->bindParam(':password', $password, PDO::PARAM_STR);
 
-	    $student_num = uniqid('US', true);
+	    $student_num = uniqid('US', true)."_".time();
 	    $name = $_POST['name'];
 	    $surname = $_POST['surname'];
 	    // $gender = $_POST['gender'];
@@ -91,7 +91,7 @@ if(isset($_GET[md5(md5('createTeacher'))])){
 	    $stmt->bindParam(':username', $username, PDO::PARAM_STR);
 	    $stmt->bindParam(':password', $password, PDO::PARAM_STR);
 
-	    $teacher_num = uniqid('UT', true);
+	    $teacher_num = uniqid('UT', true)."_".time();
 	    $name = $_POST['name'];
 	    $surname = $_POST['surname'];
 	    $username = strtolower($_POST['username']);
@@ -118,7 +118,7 @@ if(isset($_GET[md5(md5('createGroup'))])){
 	    $stmt->bindParam(':group_name', $group_name, PDO::PARAM_STR);
 	    $stmt->bindParam(':comment', $comment, PDO::PARAM_STR);
 
-	    $group_info_num = uniqid('GI', true);
+	    $group_info_num = uniqid('GI', true)."_".time();
 	    $subject_num = $_POST['subject'];
 	    $teacher_num = $_POST['teacher'];
 	    $group_name = $_POST['group_name'];
@@ -137,7 +137,7 @@ if(isset($_GET[md5(md5('createGroup'))])){
 if(isset($_GET[md5(md5('createParent'))])){
 	try {
 		include_once('../connection.php');
-		$parent_num = uniqid('P',true);
+		$parent_num = uniqid('P',true)."_".time();
 		$name = $_POST['parent_name'];
 		$surname = $_POST['parent_surname'];
 		$phone = $_POST['parent_phone'];
@@ -155,7 +155,7 @@ if(isset($_GET[md5(md5('createParent'))])){
 	    $stmtA = $conn->prepare($query);
 	    $j = 1;
 	    for($i = 0; $i<count($student_num); $i++){
-	    	$child_num = uniqid('CH',true);
+	    	$child_num = uniqid('CH',true)."_".time();
 	    	$stmtA->bindValue($j++, $child_num, PDO::PARAM_STR);
 	    	$stmtA->bindValue($j++, $parent_num, PDO::PARAM_STR);
 	    	$stmtA->bindValue($j++, $student_num[$i], PDO::PARAM_STR);
@@ -187,7 +187,7 @@ if(isset($_GET[md5(md5('set_permission'))])){
 		    $stmt->bindParam(':student_permission_num', $student_permission_num, PDO::PARAM_STR);
 		    $stmt->bindParam(':student_num', $student_num, PDO::PARAM_STR);
 
-		    $student_permission_num = uniqid('S_P', true);
+		    $student_permission_num = uniqid('S_P', true)."_".time();
 		    $student_num = $_POST['data_num'];
 
 		    $stmt->execute();
@@ -478,6 +478,123 @@ else if(isset($_GET[md5(md5('openAccess'))])){
 	}
 	echo json_encode($data);
 }
+else if(isset($_GET[md5(md5('start-lesson-date'))])){
+	try {
+		include_once('../connection.php');
+
+		$group_student_num = $_POST['gsNum'];
+		$start_date = date("Y-m-d", strtotime($_POST['start_lesson']));
+		$stmt = $conn->prepare("UPDATE group_student SET start_date = :start_lesson WHERE group_student_num = :group_student_num");
+		$stmt->bindParam(':group_student_num', $group_student_num, PDO::PARAM_STR);
+		$stmt->bindParam(':start_lesson', $start_date, PDO::PARAM_STR);
+		$stmt->execute();
+
+		$data['success'] = true;
+	} catch (PDOException $e) {
+		$data['success'] = false;
+		$data['error'] .= "Error : ".$e->getMessage()." !!!";
+	}
+	echo json_encode($data);
+}
+else if(isset($_GET[md5(md5('addVimeoVideoLink'))])){
+	try {
+		include_once('../connection.php');
+
+		$subtopic_num = $_POST['subtopic_num'];
+		$video_link = $_POST['vimeo_link'];
+		$video_num = uniqid('vV', true)."_".time();
+		$vimeo_link = "y";
+		if(substr( $video_link, 0, 7 ) != "https://"){
+			$video_link = "https://".$video_link;
+		}
+		$data['data'] = $subtopic_num." - ".$video_link." - ".$video_num." - ".$vimeo_link;
+
+		$stmt = $conn->prepare("INSERT INTO video (video_num, subtopic_num, video_link, vimeo_link) VALUES(:video_num, :subtopic_num, :video_link, :vimeo_link)");
+		$stmt->bindParam(':video_num', $video_num, PDO::PARAM_STR);
+		$stmt->bindParam(':subtopic_num', $subtopic_num, PDO::PARAM_STR);
+		$stmt->bindParam(':video_link', $video_link, PDO::PARAM_STR);
+		$stmt->bindParam(':vimeo_link', $vimeo_link, PDO::PARAM_STR);
+		$stmt->execute();
+
+		$data['success'] = true;
+	} catch (PDOException $e) {
+		$data['success'] = false;
+		$data['error'] .= "Error : ".$e->getMessage()." !!!";
+	}
+	echo json_encode($data);
+}
+
+else if(isset($_GET[md5(md5('removeVimeoVideoLink'))])){
+	try {
+		include_once('../connection.php');
+
+		$video_num = $_POST['video_num'];
+
+		$stmt = $conn->prepare("DELETE FROM video WHERE video_num = :video_num");
+		$stmt->bindParam(':video_num', $video_num, PDO::PARAM_STR);
+		$stmt->execute();
+		$data['video_num'] = $video_num;
+		$data['success'] = true;
+	} catch (PDOException $e) {
+		$data['success'] = false;
+		$data['error'] .= "Error : ".$e->getMessage()." !!!";
+	}
+	echo json_encode($data);
+}else if(isset($_GET[md5(md5('add-new-suggestion'))])){
+	try {
+		include_once('../connection.php');
+
+		$text = $_POST['suggestion_text'];
+		$status = 0;
+		$last_changed_date = date("Y-m-d H:i:s");
+		$stmt = $conn->prepare("INSERT INTO suggestion (user_num, text, status, last_changed_date) VALUES(:user_num, :text, :status, :last_changed_date)");
+		$stmt->bindParam(':user_num', $_SESSION['adminNum'], PDO::PARAM_STR);
+		$stmt->bindParam(':text', $text, PDO::PARAM_STR);
+		$stmt->bindParam(':status', $status, PDO::PARAM_INT);
+		$stmt->bindParam(':last_changed_date', $last_changed_date, PDO::PARAM_STR);
+		$stmt->execute();
+
+		$data['success'] = true;
+	} catch (PDOException $e) {
+		$data['success'] = false;
+		$data['error'] .= "Error : ".$e->getMessage()." !!!";
+	}
+	echo json_encode($data);
+
+}else if(isset($_GET[md5(md5('edit-suggestion'))])){
+	try {
+		include_once('../connection.php');
+
+		$text = $_POST['suggestion_text'];
+		$last_changed_date = date("Y-m-d H:i:s");
+		$suggestion_id = $_POST['sid'];
+		$stmt = $conn->prepare("UPDATE suggestion SET text = :text, last_changed_date = :last_changed_date WHERE suggestion_id = :suggestion_id");
+		$stmt->bindParam(':text', $text, PDO::PARAM_STR);
+		$stmt->bindParam(':last_changed_date', $last_changed_date, PDO::PARAM_STR);
+		$stmt->bindParam(':suggestion_id', $suggestion_id, PDO::PARAM_STR);
+		$stmt->execute();
+		$data['success'] = true;
+	} catch (PDOException $e) {
+		$data['success'] = false;
+		$data['error'] .= "Error : ".$e->getMessage()." !!!";
+	}
+	echo json_encode($data);
+
+}else if(isset($_GET[md5(md5('remove-suggestion'))])){
+	try {
+		include_once('../connection.php');
+
+		$suggestion_id = $_GET['sid'];
+		$stmt = $conn->prepare("DELETE FROM suggestion WHERE suggestion_id = :suggestion_id");
+		$stmt->bindParam(':suggestion_id', $suggestion_id, PDO::PARAM_STR);
+		$stmt->execute();
+		$data['success'] = true;
+	} catch (PDOException $e) {
+		$data['success'] = false;
+		$data['error'] .= "Error : ".$e->getMessage()." !!!";
+	}
+	echo json_encode($data);
+}
 
 
 
@@ -651,7 +768,7 @@ function addToDB(){
 			    // nl2br()
 
 
-			    $question_num = str_replace('.','',uniqid('Q', true));
+			    $question_num = uniqid('Q', true)."_".time();
 			    $test_num = $resultT['test_num'];
 			    // $question_txt = str_replace("\n", "<br>", $_POST['question-txt']);
 			    // $question_txt =preg_replace("/\n/", '<br />', $_POST['question-txt']);
@@ -667,7 +784,7 @@ function addToDB(){
 		    $stmtA = $conn->prepare($query);
 		    $j = 1;
 		    for($i = 0; $i<$decrease; $i++){
-		    	$answer_num = str_replace('.','',uniqid('A', true));
+		    	$answer_num = uniqid('A', true)."_".time();
 		    	$stmtA->bindValue($j++, $answer_num, PDO::PARAM_STR);
 		    	$stmtA->bindValue($j++, $question_num, PDO::PARAM_STR);
 		    	$stmtA->bindValue($j++, $answer_txt[$i], PDO::PARAM_STR);

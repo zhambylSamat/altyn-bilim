@@ -51,7 +51,7 @@ if(isset($_POST[md5(md5('addNewVideo'))]) && isset($_POST[md5('elementNum')])) {
 				    $stmt->bindParam(':subtopic_num', $subtopic_num, PDO::PARAM_STR);
 				    $stmt->bindParam(':video_link', $fileName, PDO::PARAM_STR);
 
-				    $video_num = str_replace('.','',uniqid('vV', true));
+				    $video_num = uniqid('vV', true)."_".time();
 				    $subtopic_num = $_POST[md5('elementNum')];
 				       
 				    $stmt->execute();
@@ -81,12 +81,13 @@ if(isset($_POST[md5(md5('addNewVideo'))]) && isset($_POST[md5('elementNum')])) {
 if(isset($_POST[md5('rmvVideo')]) && isset($_POST[md5('elemName')])) {
 	include('../connection.php');
 	try {
-		$stmt = $conn->prepare("DELETE FROM video WHERE video_num = :video_num");
+		// $stmt = $conn->prepare("DELETE FROM video WHERE video_num = :video_num");
+		$stmt = $conn->prepare("UPDATE video SET vimeo_link = 'n' WHERE video_num = :video_num");
 		
 		$stmt->bindParam(':video_num',$_POST[md5('rmvVideo')],PDO::PARAM_STR);
 
 		$stmt->execute();
-		unlink('../video/video_lesson/'.$_POST[md5('elemName')]);
+		// unlink('../video/video_lesson/'.$_POST[md5('elemName')]);
 		// $obj = requireToVar('ajax_adminVideo.php');
 
 

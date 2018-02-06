@@ -21,7 +21,7 @@ if(isset($_GET[md5(md5('set_permission'))])){
 		    $stmt->bindParam(':student_permission_num', $student_permission_num, PDO::PARAM_STR);
 		    $stmt->bindParam(':student_num', $student_num, PDO::PARAM_STR);
 
-		    $student_permission_num = uniqid('S_P', true);
+		    $student_permission_num = uniqid('S_P', true)."_".time();
 		    $student_num = $_POST['data_num'];
 
 		    $stmt->execute();
@@ -83,7 +83,7 @@ if(isset($_GET[md5(md5('add_trial_test_mark'))])){
 		$count = $stmt->rowCount();
 		
 		if($count==0){
-			$trial_test_num = uniqid('TT',true);
+			$trial_test_num = uniqid('TT',true)."_".time();
 			$stmt = $conn->prepare("INSERT INTO trial_test (trial_test_num, subject_num, student_num) VALUES(:trial_test_num, :subject_num, :student_num)");
 			$stmt->bindParam(':trial_test_num', $trial_test_num, PDO::PARAM_STR);
 			$stmt->bindParam(':student_num', $student_num, PDO::PARAM_STR);
@@ -116,7 +116,7 @@ else if(isset($_GET[md5(md5('student_progress'))])){
 		$subtopic_num = $_POST['stn'];
 		$student_num = $_POST['stdnum'];
 		if($student_progress_num == 'new'){
-			$student_progress_num = uniqid("SP",true);
+			$student_progress_num = uniqid("SP",true)."_".time();
 			$stmt = $conn->prepare("INSERT INTO student_progress (student_progress_num, student_num, subtopic_num, progress) VALUES(:student_progress_num, :student_num, :subtopic_num, :progress)");
 			$stmt->bindParam(':student_progress_num', $student_progress_num, PDO::PARAM_STR);
 			$stmt->bindParam(':student_num', $student_num, PDO::PARAM_STR);
@@ -185,7 +185,7 @@ else if(isset($_GET[md5(md5('submit_review_for_student'))])){
 		    $stmtA = $conn->prepare($query);
 		    $j = 1;
 		    for($i = 0; $i<count($review_info_num); $i++){
-		    	$review_num = uniqid('R', true);
+		    	$review_num = uniqid('R', true)."_".time();
 		    	$stmtA->bindValue($j++, $review_num, PDO::PARAM_STR);
 		    	$stmtA->bindValue($j++, $review_info_num[$i], PDO::PARAM_STR);
 		    	$stmtA->bindValue($j++, $group_student_num, PDO::PARAM_STR);
@@ -234,8 +234,8 @@ else if(isset($_GET[md5(md5('add-new-suggestion'))])){
 		$text = $_POST['suggestion_text'];
 		$status = 0;
 		$last_changed_date = date("Y-m-d H:i:s");
-		$stmt = $conn->prepare("INSERT INTO suggestion (teacher_num, text, status, last_changed_date) VALUES(:teacher_num, :text, :status, :last_changed_date)");
-		$stmt->bindParam(':teacher_num', $_SESSION['teacher_num'], PDO::PARAM_STR);
+		$stmt = $conn->prepare("INSERT INTO suggestion (user_num, text, status, last_changed_date) VALUES(:user_num, :text, :status, :last_changed_date)");
+		$stmt->bindParam(':user_num', $_SESSION['teacher_num'], PDO::PARAM_STR);
 		$stmt->bindParam(':text', $text, PDO::PARAM_STR);
 		$stmt->bindParam(':status', $status, PDO::PARAM_INT);
 		$stmt->bindParam(':last_changed_date', $last_changed_date, PDO::PARAM_STR);

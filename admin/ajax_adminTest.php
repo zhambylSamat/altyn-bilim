@@ -45,7 +45,7 @@
 	?>
 	<div id='<?php echo $readrow_question['question_num'];?>' style='display:<?php echo $first_display; $first_display='none'?>'>
 		<h3 class='text-danger'></h3>
-		<form action='ajaxDbTest.php' method='post' enctype="multipart/form-data">
+		<form method='post' class='add-test-form' enctype="multipart/form-data"> <!-- ajaxDbTest.php -->
 			<div class='row'>
 				<div class='form-group col-md-12 col-sm-12'>
 					<input type="hidden" name="hidden_question_num" value='<?php echo $readrow_question['question_num'];?>'>
@@ -147,7 +147,7 @@
 	<?php }}?>
 	<div id='new_question_section' style='display:<?php echo $first_display;?>;'>
 		<h3 class='text-danger'></h3>
-		<form action='ajaxDbTest.php' method='post' enctype="multipart/form-data">
+		<form method='post' class='add-test-form' enctype="multipart/form-data"> <!-- ajaxDbTest.php -->
 			<div class='row'>
 				<div class='form-group col-md-12 col-sm-12'>
 					<label for='question'>

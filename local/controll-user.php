@@ -38,6 +38,7 @@ if(isset($_POST['signIn'])){
 	    		}
 	    		else{
 	    			$_SESSION['student_num'] = $readrow['student_num'];
+	    			$_SESSION['access'] = md5('true');
 	    			$stmt = $conn->prepare("SELECT content FROM news WHERE type = :student_num AND readed = 0");
 					$stmt->bindParam(':student_num', $readrow['student_num'], PDO::PARAM_STR);
 					$stmt->execute();
@@ -47,7 +48,125 @@ if(isset($_POST['signIn'])){
 						$_SESSION['news_res_self_student'] = $news_res;
 						$_SESSION['news_notificaiton_self_student'] = 'true';
 					}
-				 	header('location:index.php');
+
+					$link = 'index.php';
+
+					// $stmt = $conn->prepare("SELECT DISTINCT 
+					// 			s.subject_num,
+					// 			s.subject_name,
+					// 			gi.group_info_num,
+    	// 						gi.group_name,
+					// 			ps.progress_student_num,
+					// 			pg.created_date,
+					// 		    ps.attendance
+					// 		FROM subject s,
+					// 			group_info gi,
+					// 		    group_student gs,
+					// 		    progress_group pg,
+					// 		    progress_student ps
+					// 		WHERE ps.student_num = :student_num    
+					// 			AND ps.progress_student_num NOT IN (SELECT progress_student_num FROM student_reason)
+					// 		    AND ps.progress_group_num = pg.progress_group_num
+					// 		    AND pg.group_info_num = gi.group_info_num
+					// 		    AND s.subject_num = gi.subject_num
+					// 		    AND pg.created_date BETWEEN (CURDATE() - INTERVAL 1 MONTH ) and CURDATE()
+					// 		ORDER BY s.subject_name, gi.group_name, pg.created_date ASC");
+					// $stmt->bindParam(':student_num', $_SESSION['student_num'], PDO::PARAM_STR);
+					// $stmt->execute();
+					// $reason_result = $stmt->fetchAll();
+					// $absents_arr = array();
+					// $absents_arr_tmp = array();
+					// $prev_abs = -1;
+					// $group_info_num = '';
+					// foreach ($reason_result as $key => $value) {
+						
+					// 	$sj_num = $value['subject_num'];
+					// 	$gr_inf_num = $value['group_info_num'];
+					// 	$attendance = $value['attendance'];
+					// 	$sj_name = $value['subject_name'];
+					// 	$gr_name = $value['group_name'];
+					// 	$cr_date = $value['created_date'];
+					// 	$pr_gr_num = $value['progress_student_num'];
+					// 	// echo "(".$value['created_date']." -> ".$attendance.")<br>";
+					// 	if($group_info_num!=$gr_inf_num || $attendance == 1){
+					// 		// echo "enter att==1 or grinf equal";
+					// 		$absents_arr_tmp = array();
+					// 	}
+					// 	if($attendance==0){
+					// 		// echo "enter att==0 ";
+					// 		$absents_arr_tmp[$sj_num]['subject_name'] = $sj_name;
+					// 		$absents_arr_tmp[$sj_num]['group'][$gr_inf_num]['group_name'] = $gr_name;
+					// 		$absents_arr_tmp[$sj_num]['group'][$gr_inf_num]['data'][$pr_gr_num] = $cr_date;
+					// 	}
+						
+					// 	// print_r($absents_arr_tmp);
+					// 	// echo "<br><br>";
+					// 	if($group_info_num==$gr_inf_num && $prev_abs==0 && $attendance==0){
+					// 		// echo count($absents_arr_tmp)."<br>";
+					// 		if(count($absents_arr_tmp)!=0){
+					// 			foreach ($absents_arr_tmp as $key => $value) {
+					// 				$absents_arr[$sj_num]['subject_name'] = $value['subject_name'];
+					// 				foreach ($value['group'] as $key => $value) {
+					// 					$absents_arr[$sj_num]['group'][$gr_inf_num]['group_name'] = $value['group_name'];
+					// 					foreach ($value['data'] as $key => $value) {
+					// 						echo "<li>".$key." -- ".$value."</li>";
+					// 						$absents_arr[$sj_num]['group'][$gr_inf_num]['data'][$key] = $value;
+					// 					}
+					// 				}
+					// 			}
+					// 			$absents_arr_tmp = array();
+					// 		}
+
+					// 		$absents_arr[$sj_num]['subject_name'] = $sj_name;
+					// 		$absents_arr[$sj_num]['group'][$gr_inf_num]['group_name'] = $gr_name;
+					// 		$absents_arr[$sj_num]['group'][$gr_inf_num]['data'][$pr_gr_num] = $cr_date;
+					// 	}
+					// 	$prev_abs = $attendance;
+					// 	$group_info_num = $gr_inf_num;
+					// }
+					$stmt = $conn->prepare("SELECT count(*) as c FROM reason_info");
+					$stmt->execute();
+					if(intval($stmt->fetch(PDO::FETCH_ASSOC)['c'])>0){
+						$stmt = $conn->prepare("SELECT DISTINCT 
+									s.subject_num,
+									s.subject_name,
+									gi.group_info_num,
+	    							gi.group_name,
+									ps.progress_student_num,
+									pg.created_date,
+								    ps.attendance
+								FROM subject s,
+									group_info gi,
+								    group_student gs,
+								    progress_group pg,
+								    progress_student ps
+								WHERE ps.student_num = :student_num    
+									AND ps.progress_student_num NOT IN (SELECT progress_student_num FROM student_reason)
+								    AND ps.progress_group_num = pg.progress_group_num
+								    AND pg.group_info_num = gi.group_info_num
+								    AND s.subject_num = gi.subject_num
+								    AND pg.created_date > '2017-12-31'
+								    AND pg.created_date BETWEEN (CURDATE() - INTERVAL 1 MONTH ) and CURDATE()
+								ORDER BY s.subject_name, gi.group_name, pg.created_date ASC");
+						$stmt->bindParam(':student_num', $_SESSION['student_num'], PDO::PARAM_STR);
+						$stmt->execute();
+						$reason_result = $stmt->fetchAll();
+						$absents_arr = array();
+						foreach ($reason_result as $key => $value) {
+							if($value['attendance']==0){
+								$absents_arr[$value['subject_num']]['subject_name'] = $value['subject_name'];
+								$absents_arr[$value['subject_num']]['group'][$value['group_info_num']]['group_name'] = $value['group_name'];
+								$absents_arr[$value['subject_num']]['group'][$value['group_info_num']]['data'][$value['progress_student_num']] = $value['created_date'];
+							}
+						}
+						if(count($absents_arr)>0){
+							$_SESSION['access'] = md5('false');
+							$link = 'reason.php';
+							$_SESSION['reason'] = $absents_arr;
+						}
+					}
+					// echo $link;
+				 	header('location:'.$link);
 			    }
 			}
 			else if($readrow['block']==2 || ($readrow['block']==3 && date("Y-m-d")!=date('Y-m-d',$readrow['block_date']))){
@@ -124,7 +243,7 @@ else if(isset($_GET[md5(md5('test_result'))]) && isset($_SESSION['test_num']) &&
 	    $stmt->bindParam(':result', $result, PDO::PARAM_STR);
 
 	    $submit_date = date("Y-m-d H:i:s");
-	    $test_result_num = str_replace('.','',uniqid('TR', true));
+	    $test_result_num = uniqid('TR', true)."_".time();
 	    $returned = 'none';
 	    if($true_answer-$wrong_answer<=0){
 			$result = 0;
@@ -154,6 +273,37 @@ else if(isset($_POST['confirm_single_student_news'])){
 		$stmt->bindParam(':student_num', $_SESSION['student_num'], PDO::PARAM_STR);
 		$stmt->bindParam(':readed', $readed, PDO::PARAM_STR);
 		$stmt->execute();
+		header('location:index.php');
+	} catch (PDOException $e) {
+		echo "Error : ".$e->getMessage()." !!!";
+	}
+}
+else if(isset($_POST['submit_reason'])){
+	try {
+		$psn = $_POST['psn'];
+		$reason_info_num = $_POST['reason'];
+		// $student_reason_num_arr = array();
+
+		$query = "INSERT INTO student_reason (student_reason_num, reason_info_num, progress_student_num) VALUES";
+	    $qPart = array_fill(0, count($reason_info_num), "(?, ?, ?)");
+	    $query .= implode(",",$qPart);
+	    $stmtA = $conn->prepare($query);
+	    $j = 1;
+	    for($i = 0; $i<count($reason_info_num); $i++){
+	    	$student_reason_num = uniqid('SR', true)."_".time();
+	    	// array_push($student_reason_num_arr, $student_reason_num);
+	    	$stmtA->bindValue($j++, $student_reason_num, PDO::PARAM_STR);
+	    	$stmtA->bindValue($j++, $reason_info_num[$i], PDO::PARAM_STR);
+	    	$stmtA->bindValue($j++, $psn[$i], PDO::PARAM_STR);
+	    }
+	    $stmtA->execute();
+
+	 //    $stmt = $conn->prepare("UPDATE progress_student SET student_reason_num = ? WHERE student_num = ? AND progress_group_num = ?");
+		// for ($i=0; $i < count($reason_info_num); $i++) {
+		// 	$stmt->execute(array($student_reason_num_arr[$i], $student_num, $pgn[$i]));
+		// }
+
+		$_SESSION['access'] = md5('true');
 		header('location:index.php');
 	} catch (PDOException $e) {
 		echo "Error : ".$e->getMessage()." !!!";

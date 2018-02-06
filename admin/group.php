@@ -12,7 +12,7 @@
 	    $stmt->execute();
 	    $result_group = $stmt->fetch(PDO::FETCH_ASSOC);
 
-	    $stmt = $conn->prepare("SELECT gs.group_student_num group_student_num, s.student_num student_num, s.name name, s.surname surname FROM student s, group_student gs WHERE gs.student_num = s.student_num AND gs.group_info_num = :group_info_num AND s.block = 0 order by s.surname asc");
+	    $stmt = $conn->prepare("SELECT gs.group_student_num group_student_num, s.student_num student_num, s.name name, s.surname surname, DATE_FORMAT(gs.start_date, '%d.%m.%Y') as start_date FROM student s, group_student gs WHERE gs.student_num = s.student_num AND gs.group_info_num = :group_info_num AND s.block != 1 order by s.surname asc");
 	    $stmt->bindParam(":group_info_num", $_GET['data_num'], PDO::PARAM_STR);
 	    $stmt->execute();
 	    $result_students_group = $stmt->fetchAll();
@@ -119,7 +119,7 @@
 										foreach ($result_students_group as $value) {
 								?>
 									<div class='head-student' style='border:1px solid lightgray; border-bottom:none; cursor: pointer;'>
-										<div style='display: inline-block; width:50%'><?php echo ($count++).") ";?><a class='header-student' data-load='n' data-name='student_single' data-num='<?php echo $value['student_num'];?>'><?php echo $value['surname']." ".$value['name']; ?></a></div>
+										<div style='display: inline-block; width:30%'><?php echo ($count++).") ";?><a class='header-student' data-load='n' data-name='student_single' data-num='<?php echo $value['student_num'];?>'><?php echo $value['surname']." ".$value['name']; ?></a></div>
 										<div style='display: inline-block;'>
 											<form style='display: inline-block;' onsubmit='return confirm("Вы уверены что хотите убрать студента с группы?");' action='admin_controller.php' method='post'>
 												<input type="hidden" name="data_num" value='<?php echo $value['student_num'];?>'>
@@ -128,6 +128,20 @@
 											</form>
 											<a title='Студентті басқа группаға ауыстыру!' data-num="<?php echo $value['student_num'];?>" data-name="<?php echo $value['surname']." ".$value['name']; ?>" class='btn btn-xs btn-info transfer-student'><span class='glyphicon glyphicon-retweet'></span></a>
 											<a class="btn btn-xs btn-default list-progress" data-toggle='modal' data-target='.box-list-student-progress'>Тақырыбы</a>
+											<span>&nbsp;<b>|</b>&nbsp;</span>
+											<?php
+												$start_date = intval(date('d', strtotime($value['start_date'])));
+												// if($start_date>=intval(date('d'))){
+												if(date("Y-m-d") <= date("Y-m-d", strtotime($value['start_date']))){
+											?>
+											<form style='display: inline-block;' method='post' id='start_lesson_form'>
+												<input type="text" class='form-control datePicker_start_lesson' placeholder="dd.mm.yyyy" title='Студенттің сабағы басталатын уақыты' id='trial-date' name="start_lesson" required="" value="<?php echo $value['start_date'];?>" style='display:inline-block; width: 60%;'>
+												<input type="submit" class='btn btn-success btn-xs' value='Сақтау'>
+												<input type="hidden" name="gsNum" value='<?php echo $value['group_student_num'];?>'>
+											</form>
+											<?php } else{ ?>
+											<span class='text-success'>Курс басталған күн: <b><?php echo $value['start_date'];?></b></span>
+											<?php } ?>
 										</div>
 									</div>
 								<?php
@@ -173,7 +187,7 @@
 						</table>
 					</center>
 					<?php
-						$month = array("","Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь");
+						$month = array("","Қаңтар","Ақпан","Наурыз","Сәуір","Мамыр","Мусым","Шілде","Тамыз","Қыркүйек","Қазан","Қараша","Желтоқсан");
 						try {
 							$stmt = $conn->prepare("SELECT DISTINCT DATE_FORMAT(created_date,'%Y-%m') as month FROM progress_group WHERE group_info_num = :group_info_num ORDER BY month ASC");
 							$stmt->bindParam(':group_info_num', $_GET['data_num'], PDO::PARAM_STR);
@@ -508,6 +522,42 @@
 			}
 		}));
 	});
+
+	$(document).on('submit','#start_lesson_form',(function(e) {
+		$thisParent = $(this).parents('.head-student');
+		$this = $(this);
+		e.preventDefault();
+		$.ajax({
+        	url: "ajaxDb.php?<?php echo md5(md5('start-lesson-date'))?>",
+			type: "POST",
+			data:  new FormData(this),
+			contentType: false,
+    	    cache: false,
+			processData:false,
+			beforeSend:function(){
+				$('#lll').css('display','block');
+			},
+			success: function(dataS){
+				$('#lll').css('display','none');
+		    	// console.log(dataS);
+		    	data = $.parseJSON(dataS);
+		    	// console.log(data);
+		    	if(data.success){
+		    		$thisParent.stop();
+					$thisParent.css({'background-color':"#5CB85C"}).animate({backgroundColor: 'rgba(255, 255, 255, 0)' },2000);
+		    	}
+		    	else{
+		    		$thisParent.stop();
+		    		$thisParent.css({'background-color':"#D9534F"}).animate({backgroundColor: 'rgba(255, 255, 255, 0)'},2000);
+		    		console.log(data);
+		    	}
+		    },
+		  	error: function(dataS) 
+	    	{
+	    		console.log(dataS);
+	    	} 	        
+	   	});
+	}));
 	// -----------------------End_Ajax------------------------
 	$(document).on('click','.transfer-student, .outer .close', function(){
 		$data_num = $(this).attr('data-num');
@@ -542,6 +592,14 @@
 		$(this).parents('td').find('p').toggle();
 		$(this).parents('td').find('a').toggle();
 		$(this).parents('td').find('form').toggle();
+	});
+
+	$(document).on('focus','.datePicker_start_lesson',function(){
+		var dateToday = new Date();
+		$(this).datepicker({
+			format: 'dd.mm.yyyy',
+            minDate: 0
+		});
 	});
 </script>
 </body>

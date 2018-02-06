@@ -272,7 +272,7 @@
 					$element += "<?php if($_SESSION['role']==md5('admin')) {?>";
 					$element += "<div class='col-md-6 col-sm-6 section-block'>";
 						$element += "<h4>";
-							$element += "<center><a class='section' data_name='video' data_num='"+$data_num+"'>Видео урок</a></center>";
+							$element += "<center><a class='section' data_name='video' data_num='"+$data_num+"'><?php echo $_SESSION['role'];?>Видео урок</a></center>";
 						$element += "</h4>";
 					$element += "</div>";
 					$element += "<?php } ?>";
@@ -341,7 +341,7 @@
 		function setSection(element_num){
 		}
 		$(document).ready(function(event){
-			$(document).on('submit','form',(function(e) {
+			$(document).on('submit','.add-test-form',(function(e) {
 				thisParent = $(this);
 				$elemNum = $(this).children(":last-child").find('input').attr('data_num');
 				e.preventDefault();
@@ -530,10 +530,90 @@
 			   	});
 			}
 		});
+		// -------------------------------------------------------------------START-VIMEO-VIDEO-------------------------------------------------------------------
+		$ccc = 0;
+		$(document).on('click','#refresh',function(){
+			console.log($ccc++);
+			$("#vimeo-content").load('ajax_vimeo_video.php');
+		});
+
+
+		$(document).on('submit','#vimeo-video-form',function(e){
+			$this = $(this);
+			e.preventDefault();
+			$.ajax({
+		    	url: "ajaxDb.php?<?php echo md5(md5('addVimeoVideoLink'))?>",
+				type: "POST",
+				data:  new FormData(this),
+				contentType: false,
+	    	    cache: false,
+				processData:false,
+				beforeSend:function(){
+					$('#lll').css('display','block');
+				},
+				success: function(dataS){
+					
+			    	console.log(dataS);
+			    	data = $.parseJSON(dataS);
+			    	// console.log(data);
+			    	if(data.success){
+			    		$("#vimeo-content").load('ajax_vimeo_video.php');
+			    		$('#lll').css('display','none');
+			    		$this.parents('.row').stop().css({'background-color':"#5CB85C"}).animate({backgroundColor: 'rgba(255, 255, 255, 0)'});
+			    	}
+			    	else{
+			    		$this.parents('.row').stop().css({'background-color':"#D9534F"}).animate({backgroundColor: 'rgba(255, 255, 255, 0)'});
+				    	$('#lll').css('display','none');
+			    	}
+			    },
+			  	error: function(dataS) 
+		    	{
+		    		console.log(dataS);
+		    	} 	     
+		   	});
+		});
+		$(document).on('submit','#remove-link',function(e){
+			$this = $(this);
+			e.preventDefault();
+			if(confirm("Вы точно хотите удалить видео.")){
+				$.ajax({
+			    	url: "ajaxDb.php?<?php echo md5(md5('removeVimeoVideoLink'))?>",
+					type: "POST",
+					data:  new FormData(this),
+					contentType: false,
+		    	    cache: false,
+					processData:false,
+					beforeSend:function(){
+						$('#lll').css('display','block');
+					},
+					success: function(dataS){
+						console.log("okkkkeeeyyy");
+						
+				    	console.log(dataS);
+				    	data = $.parseJSON(dataS);
+				    	// console.log(data);
+				    	if(data.success){
+				    		$("#vimeo-content").load('ajax_vimeo_video.php');
+				    		$('#lll').css('display','none');
+				    		$this.parents('.row').stop().css({'background-color':"#5CB85C"}).animate({backgroundColor: 'rgba(255, 255, 255, 0)'});
+				    	}
+				    	else{
+				    		$this.parents('.row').stop().css({'background-color':"#D9534F"}).animate({backgroundColor: 'rgba(255, 255, 255, 0)'});
+					    	$('#lll').css('display','none');
+				    	}
+				    },
+				  	error: function(dataS) 
+			    	{
+			    		console.log(dataS);
+			    	} 	     
+			   	});
+			}
+		});
+		// -------------------------------------------------------------------END-VIMEO-VIDEO---------------------------------------------------------------------
 	</script>
 	<script>
     function reload_js(src) {
-        $('script[src="http://vjs.zencdn.net/ie8/1.1.2/videojs-ie8.min.j"]').remove();
+        $('script[src="https://vjs.zencdn.net/ie8/1.1.2/videojs-ie8.min.j"]').remove();
         $('<script>').attr('src', src).appendTo('head');
     }
     reload_js('source_file.js');

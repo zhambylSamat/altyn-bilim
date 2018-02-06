@@ -1,11 +1,9 @@
-
+<div style='background-color:#FFB564; padding:0.1% 0.1%; color:#555; margin:0.5% 0; display: inline-block; font-size: 11px;'><b>*Оқушылардың "комменттері" енгізілмеген</b> <i>(мұғалімдегре ескерту керек)</i></div>
 <table class="table table-striped table-bordered">
 	<?php
 		$result_student = array();
 		include('../connection.php');
-		// if(!$_SESSION['load_page']){
-		// 	$_SESSION['page'] = 'student';
-		// }
+
 		if(!isset($_GET['search']) || $_GET['search']==''){ 
 			try {
 				$stmt = $conn->prepare("SELECT s.student_num,
@@ -13,29 +11,31 @@
 										    s.surname,
 										    s.username,
 										    s.password_type,
-										    (select n.readed from news n where n.type = s.student_num ) as readed,
-                                            (select count(r2.group_student_num) 
-                                        	from review r2, 
+										    (SELECT n.readed FROM news n WHERE n.type = s.student_num ) AS readed,
+                                            (SELECT count(r2.group_student_num) 
+                                        	FROM review r2, 
                                         		group_student gs3,
                                         		group_info gr_info
-                                        	where r2.review_info_num != (select review_info_num 
-                                        								from review_info 
-                                        								where description = 'comment') 
+                                        	WHERE r2.review_info_num != (SELECT review_info_num 
+                                        								FROM review_info 
+                                        								WHERE description = 'comment') 
                                         		AND r2.group_student_num = gs3.group_student_num 
                                         		AND gs3.group_info_num = gr_info.group_info_num
                                         		AND gr_info.subject_num != 'S5985a7ea3d0ae721486338'
-                                        		AND s.student_num = gs3.student_num ) as c1,
-    										(select count(group_student_num) 
-    										from group_student gs2,
+                                        		AND gs3.start_date <= CURDATE()
+                                        		AND s.student_num = gs3.student_num ) AS c1,
+    										(SELECT count(group_student_num) 
+    										FROM group_student gs2,
     											group_info gr_info
-    										where gs2.student_num = s.student_num
+    										WHERE gs2.student_num = s.student_num
     											AND gs2.group_info_num = gr_info.group_info_num
+    											AND gs2.start_date <= CURDATE()
     											AND gr_info.subject_num != 'S5985a7ea3d0ae721486338'
-    											) as c2
+    											) AS c2
 										FROM student s
  										where s.block = 0
-										group by s.student_num 
-										order by s.surname, s.name asc");
+										GROUP BY s.student_num 
+										ORDER BY s.surname, s.name ASC");
 			    $stmt->execute();
 			    $result_student = $stmt->fetchAll(); 
 
@@ -63,12 +63,12 @@
 		}
 		$student_number = 1;
 		foreach ($result_student as $readrow) {
-			$class = '';
+			$bg_color = '';
 			if($readrow['c1']!=$readrow['c2']*intval($total_comment_number['c'])){
-				$class='warning';
+				$bg_color='#FFB564';
 			}
 	?>
-	<tr class='head <?php echo $class;?>'>
+	<tr class='head' style='background-color:<?php echo $bg_color;?>;'>
 		<td style='width: 1%;'>
 			<center>
 				<h4>

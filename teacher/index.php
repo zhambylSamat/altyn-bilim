@@ -8,11 +8,20 @@
 		$stmt = $conn->prepare("SELECT gi.group_info_num, 
 									gi.group_name, 
 									gi.comment, 
-									s.subject_name, 
-									(SELECT count(*) 
+									s.subject_name,
+									(CASE WHEN (WEEKDAY(CURDATE())+1 IN (SELECT sch.week_id 
+                                         FROM schedule sch 
+                                         WHERE sch.group_info_num = gi.group_info_num))
+								    THEN
+								    	'true'
+								    ELSE
+								     	'false'
+								    END) AS lesson,
+									(SELECT count(s.student_num) 
 									FROM group_student gs, 
 										student s 
 									WHERE gs.group_info_num = gi.group_info_num 
+										AND gs.start_date <= CURDATE()
 										AND s.student_num = gs.student_num 
 										AND s.block != 1 ) student_quantity 
 								FROM group_info gi, 
@@ -68,10 +77,16 @@
 						foreach ($result_groups as $value) {
 					?>
 					<tr>
-						<td><center><a href="group.php?data_num=<?php echo $value['group_info_num'];?>"><?php echo $value['group_name'];?></a></center></td>
-						<td><center><a href="group.php?data_num=<?php echo $value['group_info_num'];?>"><?php echo $value['subject_name'] ; ?></a></center></td>
-						<td><center><a href="group.php?data_num=<?php echo $value['group_info_num'];?>"><?php echo $value['student_quantity'];?></a></center></td>
-						<td><center><a href="group.php?data_num=<?php echo $value['group_info_num'];?>"><?php echo $value['comment'];?></a></center></td>
+						<td>
+							<center>
+								<a style='display: block;' href="group.php?<?php echo 'data_num='.$value['group_info_num'].'&'.md5('lesson').'='.md5($value['lesson']);?>">
+									<?php echo $value['group_name'];?>
+								</a>
+							</center>
+						</td>
+						<td><center><?php echo $value['subject_name'] ; ?></center></td>
+						<td><center><?php echo $value['student_quantity'];?></center></td>
+						<td><center><?php echo $value['comment'];?></center></td>
 					</tr>
 					<?php } ?>
 				</table>
@@ -181,6 +196,53 @@
 			$(this).css('display','none'); // hide loading div
 		});
 	});
+
+	$worker = new Worker("js/alert_timer.js");
+	$time_arr = [];
+	$(document).ready(function(){
+		$.ajax({
+	    	url: "load_schedule_time.php",
+			cache : false,
+			success: function(dataS){
+		    	// console.log(dataS);
+		    	data = $.parseJSON(dataS);
+		    	// console.log(data);
+		    	if(data.success){
+		    		$time_arr = data.data;
+		    		console.log($time_arr);
+					timeNotification();
+		    	}
+		    },
+		  	error: function(dataS) 
+	    	{
+	    		console.log("ERROR: ");
+	    		console.log(dataS);
+	    	} 	        
+	   	});
+	});
+
+	function timeNotification(){
+		if(typeof(Worker) !== "undefined"){
+			// for ($i = 0; $i < $time_arr.length; $i++) {
+				$i = 0;
+				if($time_arr.length > 0 && $time_arr[$i]!=""){
+					$worker.postMessage($time_arr[$i]);
+					$time_arr[$i] = "";
+					console.log($time_arr[$i]);
+					// break;
+				}
+			// }
+		}
+	}
+
+	$worker.onmessage = function(e){
+		if(e.data=='show'){
+		$(".box .modal-title").html("<center><h2><b>Ұмытпа!</b></h2></center>");
+		$(".box .modal-body").html("<center><h3>1. Оқушыға қол қоюға журналды бер!<br>2. Пробный тесттен жинаған балдарды жазып ал!<br>3. Порталдағы журналды белгіле, бағаларын қой!</h3></center>");
+		$(".box").modal(e.data);
+		// timeNotification();
+		}
+	}
 	
 	$(document).on('click','.suggestion',function(){
 		$(".box-suggestion .modal-body").html("<center><h3>Loading...</h3></center>");
